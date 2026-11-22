@@ -34,14 +34,13 @@ if not exist ".github\workflows\build.yml" (
 if not exist ".github\workflows\build.yml" goto :no_kit
 
 set "VER="
-set /p VER="Digite a versao da tag e aperte Enter [padrao: v0.3.1]: "
-if "!VER!"=="" set "VER=v0.3.1"
+set /p VER="Digite a versao da tag e aperte Enter [padrao: v0.3.2]: "
+if "!VER!"=="" set "VER=v0.3.2"
 if /i not "!VER:~0,1!"=="v" set "VER=v!VER!"
 
 echo.
 echo [1/5] Preparando repositorio Git local...
 if not exist ".git" git init
-if not exist ".git\HEAD" git branch -M main
 git branch -M main
 
 git remote get-url origin >nul 2>nul
@@ -56,21 +55,28 @@ if errorlevel 1 git config user.name "DyFuchs"
 git config user.email >nul 2>nul
 if errorlevel 1 git config user.email "DyFuchs@users.noreply.github.com"
 
+rem Limpar eventual merge pendente de tentativa anterior
+git merge --abort >nul 2>nul
+
 echo.
-echo [2/5] Adicionando arquivos e criando commit...
+echo [2/5] Sincronizando historico com o GitHub - pode abrir login na 1a vez...
+git fetch origin main >nul 2>nul
+if not errorlevel 1 git reset --soft origin/main >nul 2>nul
+
+echo.
+echo [3/5] Adicionando arquivos da nova versao e criando commit...
 git add -A
 git commit -m "Rekordbox Vault !VER!"
 if errorlevel 1 echo [INFO] Nenhuma alteracao nova para commitar. Seguindo com push e tag...
 
 echo.
-echo [3/5] Sincronizando com o GitHub - pode abrir janela de login na 1a vez...
-git fetch origin main >nul 2>nul
-if not errorlevel 1 git pull origin main --allow-unrelated-histories --no-edit >nul 2>nul
-
-echo.
 echo [4/5] Enviando codigo para branch main...
 git push -u origin main
-if errorlevel 1 goto :err_push
+if errorlevel 1 (
+    echo [INFO] Sincronizando branch main com a nova pasta do kit...
+    git push -u -f origin main
+    if errorlevel 1 goto :err_push
+)
 
 echo.
 echo [5/5] Criando e enviando tag !VER! para disparar os builds...

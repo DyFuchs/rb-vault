@@ -33,7 +33,7 @@ from pathlib import Path
 IS_WIN = platform.system() == "Windows"
 IS_MAC = platform.system() == "Darwin"
 
-APP_VERSION = "v0.3.1"
+APP_VERSION = "v0.3.2"
 if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
     _meipass = Path(sys._MEIPASS)
     APP_DIR = (_meipass / "app") if (_meipass / "app" / "ui.html").exists() else _meipass
@@ -2161,6 +2161,8 @@ def export_selected_playlists(
     selected_sample_items: list[dict] | None = None,
     sampler_global_props: dict | None = None,
     pack_tags: list[str] | None = None,
+    pack_description_html: str = "",
+    pack_description_text: str = "",
     include_rb_prefs: bool = False,
     include_rb_fx: bool = False,
     include_rb_midi: bool = False,
@@ -2342,8 +2344,10 @@ def export_selected_playlists(
     write_rekordbox_xml(root, out_xml)
 
     pack_manifest = {
-        "packVersion": "0.0.9",
+        "packVersion": "0.3.2",
         "packTags": clean_tags,
+        "packDescriptionHtml": str(pack_description_html or "")[:18000],
+        "packDescriptionText": str(pack_description_text or "")[:3000],
         "includesRbPrefs": rb_extras_bundled["prefs"] > 0,
         "includesRbFx": rb_extras_bundled["fx"] > 0,
         "includesRbMidi": rb_extras_bundled["midi"] > 0,
@@ -2695,6 +2699,8 @@ def _fast_inspect_zip_pack(source_path: Path) -> dict | None:
                 "hasSamplerPadEdits": has_pad_edits,
                 "samplesConfigOnly": bool(mf.get("samplesConfigOnly")),
                 "packTags": mf.get("packTags") or [],
+                "packDescriptionHtml": str(mf.get("packDescriptionHtml") or ""),
+                "packDescriptionText": str(mf.get("packDescriptionText") or ""),
                 "includesRbPrefs": has_prefs,
                 "includesRbFx": has_fx,
                 "includesRbMidi": has_midi,
@@ -2745,6 +2751,8 @@ def inspect_playlist_pack(source_path: Path) -> dict:
             "rekordboxSamplerCount": int(mf.get("rekordboxSamplerCount") or 0),
             "hasSamplerPadEdits": (work_dir / "sampler_settings_export.xml").exists(),
             "packTags": mf.get("packTags") or [],
+            "packDescriptionHtml": str(mf.get("packDescriptionHtml") or ""),
+            "packDescriptionText": str(mf.get("packDescriptionText") or ""),
             "includesRbPrefs": bool(mf.get("includesRbPrefs")) or (work_dir / "rb_config" / "prefs").exists(),
             "includesRbFx": bool(mf.get("includesRbFx")) or (work_dir / "rb_config" / "fx").exists(),
             "includesRbMidi": bool(mf.get("includesRbMidi")) or (work_dir / "rb_config" / "midi").exists(),
@@ -3011,6 +3019,8 @@ def import_selected_playlists(
                 "totalSamplesCount": (extracted_samples_count + reused_samples_count),
                 "hasSamplerPadEdits": (pack_dest_dir / "sampler_settings_export.xml").exists(),
                 "packTags": mf.get("packTags") or [],
+                "packDescriptionHtml": str(mf.get("packDescriptionHtml") or ""),
+                "packDescriptionText": str(mf.get("packDescriptionText") or ""),
                 "includesRbPrefs": (pack_dest_dir / "rb_config" / "prefs").exists(),
                 "includesRbFx": (pack_dest_dir / "rb_config" / "fx").exists(),
                 "includesRbMidi": (pack_dest_dir / "rb_config" / "midi").exists(),
@@ -3601,6 +3611,29 @@ class VaultHandler(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
         path = urllib.parse.urlparse(self.path).path
         try:
+            if path == "/api/xml/upload-drop":
+                raw_name = urllib.parse.unquote(self.headers.get("X-Filename") or "pacote_arrastado.zip")
+                base_name = Path(raw_name.replace("\\", "/")).name
+                ext = Path(base_name).suffix.lower()
+                if ext not in (".zip", ".xml"):
+                    return self._send_json({"ok": False, "error": "Envie um arquivo .zip ou .xml válido."}, 400)
+                safe_fn = re.sub(r"[^a-zA-Z0-9._-]+", "_", base_name).strip("_") or f"pacote{ext}"
+                drop_dir = CACHE_DIR / "dropped_packs"
+                drop_dir.mkdir(parents=True, exist_ok=True)
+                dst_path = drop_dir / safe_fn
+                total_len = int(self.headers.get("Content-Length") or 0)
+                if total_len <= 0:
+                    return self._send_json({"ok": False, "error": "Arquivo vazio."}, 400)
+                remaining = total_len
+                with open(dst_path, "wb") as fout:
+                    while remaining > 0:
+                        chunk = self.rfile.read(min(1024 * 1024, remaining))
+                        if not chunk:
+                            break
+                        fout.write(chunk)
+                        remaining -= len(chunk)
+                return self._send_json({"ok": True, "path": str(dst_path.resolve()), "fileName": base_name})
+
             body = self._read_json()
 
             if path == "/api/settings":
@@ -3723,6 +3756,8 @@ class VaultHandler(http.server.BaseHTTPRequestHandler):
                     selected_sample_items=selected_samples,
                     sampler_global_props=body.get("samplerGlobalProps") or {},
                     pack_tags=body.get("packTags") or [],
+                    pack_description_html=str(body.get("packDescriptionHtml") or "")[:18000],
+                    pack_description_text=str(body.get("packDescriptionText") or "")[:3000],
                     include_rb_prefs=inc_prefs,
                     include_rb_fx=inc_fx,
                     include_rb_midi=inc_midi,

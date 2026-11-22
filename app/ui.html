@@ -464,7 +464,7 @@
     padding: 12px 14px; border-radius: 11px; background: var(--surface-3); border: 1px solid var(--border);
   }
 
-/* v0.3.1: Collapsible Cards (Item 48), Playlist Tracklist Drawer (Item 43), Size Estimate (Item 42), Tag Color Picker (Item 46) */
+/* v0.3.2: Collapsible Cards (Item 48), Playlist Tracklist Drawer (Item 43), Size Estimate (Item 42), Tag Color Picker (Item 46) */
 .card-head-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
 .card-head-row .card-title{margin-bottom:0}
 .card-collapse-btn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;font-size:13px;transition:transform .16s ease,background .15s,color .15s;flex-shrink:0}
@@ -490,6 +490,24 @@
 .tag-color-dot:hover{transform:scale(1.18)}
 .tag-color-dot.selected{border-color:#fff;box-shadow:0 0 0 1px var(--accent)}
 .tag-color-input{width:24px;height:20px;padding:0;border:1px solid var(--border);border-radius:4px;background:transparent;cursor:pointer}
+
+/* v0.3.2: Rich Text Description Editor (Item 49) & Drag-and-Drop Import Zone (Item 50) */
+.desc-toolbar{display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:6px 8px;background:var(--surface-2);border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0}
+.desc-tool-btn{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:26px;padding:0 7px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;font-size:12px;font-weight:700;transition:background .12s,border-color .12s}
+.desc-tool-btn:hover{border-color:var(--accent);color:var(--accent)}
+.desc-editor{min-height:110px;max-height:260px;overflow-y:auto;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:0 0 8px 8px;color:var(--text);font-size:13px;line-height:1.5;outline:none;word-break:break-word}
+.desc-editor:focus{border-color:var(--accent)}
+.desc-editor:empty:before{content:attr(data-placeholder);color:var(--dim);pointer-events:none}
+.desc-counter{font-size:11px;color:var(--muted);text-align:right;margin-top:4px}
+.desc-counter.near-limit{color:var(--amber)}
+.desc-counter.at-limit{color:var(--red);font-weight:700}
+.desc-preview-box{padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);font-size:12.5px;line-height:1.5;max-height:180px;overflow-y:auto;word-break:break-word}
+.drop-zone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:22px 16px;margin-bottom:12px;border:2px dashed var(--border);border-radius:12px;background:var(--bg);cursor:pointer;text-align:center;transition:border-color .16s ease,background .16s ease,transform .12s ease}
+.drop-zone:hover{border-color:var(--accent);background:rgba(16,185,129,.05)}
+.drop-zone.drag-over{border-color:var(--accent);background:rgba(16,185,129,.12);transform:scale(1.005)}
+.drop-zone-icon{font-size:26px;line-height:1}
+.drop-zone-title{font-size:13.5px;font-weight:700;color:var(--text)}
+.drop-zone-sub{font-size:11.5px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -514,7 +532,7 @@
           <h1>Rekordbox Vault</h1>
           <span id="modePill" class="mode-pill hidden">Avançado</span>
         </div>
-        <div id="appVersionText" class="app-version">v0.3.1</div>
+        <div id="appVersionText" class="app-version">v0.3.2</div>
       </div>
     </div>
 
@@ -559,107 +577,194 @@
 
   <!-- ==================== ABA 1: EXPORTAR PLAYLISTS ==================== -->
   <section id="tab-export">
+    <!-- DIV 1: INFORMAÇÕES DO PACOTE -->
     <div class="card">
       <div class="card-head-row">
-        <div class="card-title">1. Suas playlists do Rekordbox</div>
-        <button type="button" class="card-collapse-btn" onclick="toggleCardCollapse('cardPlaylistsBody', this)" title="Minimizar ou expandir lista de playlists" aria-label="Minimizar ou expandir">▾</button>
+        <div class="card-title">1. Informações do Pacote</div>
+        <button type="button" class="card-collapse-btn" onclick="toggleCardCollapse('cardPackInfoBody', this)" title="Minimizar ou expandir Informações do Pacote" aria-label="Minimizar ou expandir">▾</button>
       </div>
-      <div id="cardPlaylistsBody">
-
-      <div id="autoLoadBanner" style="font-size:12.5px;color:var(--muted);margin-bottom:10px" class="hidden"></div>
-
-      <div class="row-wrap" style="margin-bottom:10px">
-        <button id="btnDirectReadDb" class="btn btn-primary" onclick="loadDirectFromRekordboxDb(false)">⚡ Ler playlists direto do Rekordbox</button>
-        <button id="btnSetupDirectDb" class="btn btn-sec hidden" onclick="setupDirectDbReader()">Ativar leitura direta (1 clique)</button>
-        <button class="btn btn-sec adv-only" onclick="exportAutoXmlToFolder()">Salvar XML completo...</button>
-      </div>
-      <div class="row">
-        <input type="text" id="plExportXmlPath" placeholder="Ou selecione/cole um arquivo rekordbox.xml manual..." />
-        <button class="btn btn-sec" onclick="pickXmlForExport()">Escolher XML</button>
-        <button class="btn btn-sec" onclick="loadXmlFromInput()">Carregar</button>
-      </div>
-
-      <div id="plExportListWrap" class="hidden" style="margin-top:10px">
-        <div class="row" style="justify-content:space-between;margin-bottom:6px">
-          <input type="search" id="plExportSearch" placeholder="Filtrar playlists..." oninput="renderPlList('export')" style="max-width:280px" />
-          <div class="row">
-            <button class="btn btn-sec" style="padding:5px 10px;font-size:11.5px" onclick="loadDirectFromRekordboxDb(false)" title="Recarregar playlists do Rekordbox">↻</button>
-            <button class="btn btn-sec" style="padding:5px 10px;font-size:11.5px" onclick="toggleAllPl('export', true)">Todas</button>
-            <button class="btn btn-sec" style="padding:5px 10px;font-size:11.5px" onclick="toggleAllPl('export', false)">Limpar</button>
+      <div id="cardPackInfoBody">
+        <div class="grid-2" style="margin-bottom:12px">
+          <div>
+            <label class="field">Nome do pacote <span style="color:var(--red)">*</span></label>
+            <input type="text" id="plPackName" value="" placeholder="Digite um nome para este pacote..." oninput="this.classList.remove('input-error')" />
+          </div>
+          <div>
+            <label class="field">Pasta de destino</label>
+            <div class="row">
+              <input type="text" id="plExportDest" />
+              <button class="btn btn-sec" onclick="pickFolderInto('plExportDest')">Alterar...</button>
+            </div>
           </div>
         </div>
-        <div id="plExportBox" class="pl-box"></div>
-        <div id="plExportSummary" style="font-size:12px;color:var(--muted)"></div>
-      </div>
 
-      <div id="readProgressWrap" class="prog-wrap hidden">
-        <div class="prog-track">
-          <div id="readProgressFill" class="prog-fill"></div>
-          <span id="readProgressLabel" class="prog-label">0%</span>
+        <!-- Tags do Pacote -->
+        <div class="sub-panel" style="margin:0 0 12px 0">
+          <div class="sub-panel-head" style="margin-bottom:8px">
+            <span style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--dim)">Tags do Pacote</span>
+            <div class="row" style="gap:6px">
+              <button type="button" class="btn btn-sec" style="padding:3px 8px;font-size:11px" onclick="openGalleryTagsModal()" title="Personalizar cores e gerenciar tags">🎨 Cores das tags</button>
+              <span id="expTagsCountBadge" class="badge empty">0 selecionada(s)</span>
+            </div>
+          </div>
+          <div id="expTagsChipsWrap" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px"></div>
+          <div class="row" style="max-width:380px">
+            <input type="text" id="expNewTagInput" placeholder="Criar nova tag personalizada..." onkeydown="if(event.key==='Enter') addExportTag()" />
+            <button class="btn btn-sec" style="padding:7px 11px;font-size:12px" onclick="addExportTag()">+ Tag</button>
+          </div>
         </div>
-      </div>
+
+        <!-- Tamanho estimado + Resumo (playlists, faixas e samples) -->
+        <div id="exportSizeEstBar" class="size-est-bar" style="margin-bottom:12px">
+          <div style="min-width:0;flex:1">
+            <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--dim)">Tamanho estimado e Resumo</div>
+            <div id="exportSizeEstSub" class="size-est-sub">0 playlists • 0 faixas • 0 samples</div>
+          </div>
+          <div class="row" style="gap:10px;flex-shrink:0">
+            <div id="exportSizeEstVal" class="size-est-val">~0 MB</div>
+            <button type="button" class="btn btn-primary" style="padding:7px 13px;font-size:12px" onclick="runExportPlaylists()">Exportar Pacote</button>
+          </div>
+        </div>
+
+        <!-- Descrição opcional (oculta por padrão, até 3000 caracteres, com formatação) -->
+        <div class="sub-panel" style="margin:0 0 12px 0">
+          <label class="check-row" style="margin-bottom:0">
+            <input type="checkbox" id="plAddDescChk" onchange="togglePackDescEditor()" />
+            <span><strong>Adicionar descrição</strong> <span style="color:var(--dim);font-size:11.5px">(opcional, até 3.000 caracteres com formatação)</span></span>
+          </label>
+          <div id="plPackDescWrap" class="hidden" style="margin-top:10px">
+            <div class="desc-toolbar">
+              <button type="button" class="desc-tool-btn" onmousedown="event.preventDefault()" onclick="execDescCmd('bold')" title="Negrito"><strong>B</strong></button>
+              <button type="button" class="desc-tool-btn" onmousedown="event.preventDefault()" onclick="execDescCmd('italic')" title="Itálico"><em>I</em></button>
+              <button type="button" class="desc-tool-btn" onmousedown="event.preventDefault()" onclick="execDescCmd('underline')" title="Sublinhado"><u>U</u></button>
+              <span style="width:1px;height:18px;background:var(--border);margin:0 2px"></span>
+              <span style="font-size:11px;color:var(--dim)">Cor:</span>
+              <button type="button" class="tag-color-dot" style="background:#f8fafc" onmousedown="event.preventDefault()" onclick="execDescColor('#f8fafc')" title="Branco"></button>
+              <button type="button" class="tag-color-dot" style="background:#10b981" onmousedown="event.preventDefault()" onclick="execDescColor('#10b981')" title="Verde"></button>
+              <button type="button" class="tag-color-dot" style="background:#38bdf8" onmousedown="event.preventDefault()" onclick="execDescColor('#38bdf8')" title="Azul"></button>
+              <button type="button" class="tag-color-dot" style="background:#f59e0b" onmousedown="event.preventDefault()" onclick="execDescColor('#f59e0b')" title="Amarelo"></button>
+              <button type="button" class="tag-color-dot" style="background:#f43f5e" onmousedown="event.preventDefault()" onclick="execDescColor('#f43f5e')" title="Rosa/Vermelho"></button>
+              <input type="color" id="descColorPicker" class="tag-color-input" value="#10b981" onchange="execDescColor(this.value)" title="Escolher outra cor de fonte" />
+              <span style="width:1px;height:18px;background:var(--border);margin:0 2px"></span>
+              <button type="button" class="desc-tool-btn" style="font-weight:500;font-size:11px" onmousedown="event.preventDefault()" onclick="execDescCmd('removeFormat')" title="Limpar formatação">Limpar</button>
+            </div>
+            <div id="plPackDescEditor" class="desc-editor" contenteditable="true" data-placeholder="Escreva notas sobre este set, ordem de energia, equipamentos, instruções ou observações..." oninput="enforcePackDescLimit()" onpaste="handlePackDescPaste(event)"></div>
+            <div id="plPackDescCounter" class="desc-counter">0 / 3000 caracteres</div>
+          </div>
+        </div>
+
+        <!-- Configurações do Rekordbox (por último na Div 1) -->
+        <div class="sub-panel" style="margin:0">
+          <div class="sub-panel-head" style="margin-bottom:8px">
+            <span style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--dim)">Configurações do Rekordbox (opcional)</span>
+            <span id="rbExtrasBadge" class="badge empty">Detectando...</span>
+          </div>
+          <label class="check-row" style="margin-bottom:6px">
+            <input type="checkbox" id="plIncludeRbPrefs" onchange="updateExportSizeEstimate()" />
+            <span>Incluir <strong>Preferências do Rekordbox</strong> <span id="rbPrefsCountLbl" style="color:var(--dim);font-size:11.5px"></span></span>
+          </label>
+          <label class="check-row" style="margin-bottom:6px">
+            <input type="checkbox" id="plIncludeRbFx" onchange="updateExportSizeEstimate()" />
+            <span>Incluir <strong>Efeitos configurados</strong> (FX Units, Pad FX, Beat FX) <span id="rbFxCountLbl" style="color:var(--dim);font-size:11.5px"></span></span>
+          </label>
+          <label class="check-row" style="margin-bottom:0">
+            <input type="checkbox" id="plIncludeRbMidi" onchange="updateExportSizeEstimate()" />
+            <span>Incluir <strong>Configurações de MIDI</strong> (mapeamentos e atalhos) <span id="rbMidiCountLbl" style="color:var(--dim);font-size:11.5px"></span></span>
+          </label>
+        </div>
       </div>
     </div>
 
+    <!-- DIV 2: LISTA DE PLAYLISTS -->
     <div class="card">
       <div class="card-head-row">
-        <div class="card-title">2. Gerar Pacote (.zip)</div>
-        <button type="button" class="card-collapse-btn" onclick="toggleCardCollapse('cardExportPackBody', this)" title="Minimizar ou expandir Gerar Pacote" aria-label="Minimizar ou expandir">▾</button>
+        <div class="card-title">2. Lista de Playlists</div>
+        <button type="button" class="card-collapse-btn" onclick="toggleCardCollapse('cardPlaylistsBody', this)" title="Minimizar ou expandir Lista de Playlists" aria-label="Minimizar ou expandir">▾</button>
       </div>
-      <div id="cardExportPackBody">
-      <div class="grid-2" style="margin-bottom:12px">
-        <div>
-          <label class="field">Nome do pacote <span style="color:var(--red)">*</span></label>
-          <input type="text" id="plPackName" value="" placeholder="Digite um nome para este pacote..." oninput="this.classList.remove('input-error')" />
+      <div id="cardPlaylistsBody">
+        <div id="autoLoadBanner" style="font-size:12.5px;color:var(--muted);margin-bottom:10px" class="hidden"></div>
+
+        <div class="row-wrap" style="margin-bottom:10px">
+          <button id="btnDirectReadDb" class="btn btn-primary" onclick="loadDirectFromRekordboxDb(false)">⚡ Ler playlists direto do Rekordbox</button>
+          <button id="btnSetupDirectDb" class="btn btn-sec hidden" onclick="setupDirectDbReader()">Ativar leitura direta (1 clique)</button>
+          <button class="btn btn-sec adv-only" onclick="exportAutoXmlToFolder()">Salvar XML completo...</button>
         </div>
-        <div>
-          <label class="field">Pasta de destino</label>
-          <div class="row">
-            <input type="text" id="plExportDest" />
-            <button class="btn btn-sec" onclick="pickFolderInto('plExportDest')">Alterar...</button>
+        <div class="row">
+          <input type="text" id="plExportXmlPath" placeholder="Ou selecione/cole um arquivo rekordbox.xml manual..." />
+          <button class="btn btn-sec" onclick="pickXmlForExport()">Escolher XML</button>
+          <button class="btn btn-sec" onclick="loadXmlFromInput()">Carregar</button>
+        </div>
+
+        <div id="plExportListWrap" class="hidden" style="margin-top:10px">
+          <div class="row" style="justify-content:space-between;margin-bottom:6px">
+            <input type="search" id="plExportSearch" placeholder="Filtrar playlists..." oninput="renderPlList('export')" style="max-width:280px" />
+            <div class="row">
+              <button class="btn btn-sec" style="padding:5px 10px;font-size:11.5px" onclick="loadDirectFromRekordboxDb(false)" title="Recarregar playlists do Rekordbox">↻</button>
+              <button class="btn btn-sec" style="padding:5px 10px;font-size:11.5px" onclick="toggleAllPl('export', true)">Todas</button>
+              <button class="btn btn-sec" style="padding:5px 10px;font-size:11.5px" onclick="toggleAllPl('export', false)">Limpar</button>
+            </div>
+          </div>
+          <div id="plExportBox" class="pl-box"></div>
+          <div id="plExportSummary" style="font-size:12px;color:var(--muted)"></div>
+        </div>
+
+        <div id="readProgressWrap" class="prog-wrap hidden">
+          <div class="prog-track">
+            <div id="readProgressFill" class="prog-fill"></div>
+            <span id="readProgressLabel" class="prog-label">0%</span>
           </div>
         </div>
-      </div>
 
-      <label id="audioMusicCard" class="audio-toggle-card">
-        <span class="audio-toggle-left">
-          <input type="checkbox" id="plIncludeAudio" checked onchange="syncAudioToggleCards()" />
-          <span>
-            <div class="audio-toggle-title">Copiar também os arquivos de música (MP3/WAV/AIFF)</div>
-            <div class="audio-toggle-sub">Inclui os áudios das playlists escolhidas dentro do pacote .zip</div>
+        <label id="audioMusicCard" class="audio-toggle-card" style="margin:12px 0 0 0">
+          <span class="audio-toggle-left">
+            <input type="checkbox" id="plIncludeAudio" checked onchange="syncAudioToggleCards()" />
+            <span>
+              <div class="audio-toggle-title">Copiar também os arquivos de música (MP3/WAV/AIFF)</div>
+              <div class="audio-toggle-sub">Inclui os áudios das playlists escolhidas dentro do pacote .zip</div>
+            </span>
           </span>
-        </span>
-        <span id="audioMusicPill" class="audio-toggle-pill">Com músicas</span>
-      </label>
-
-      <div class="sampler-meta">
-        <span id="rbSamplerBadge" class="badge empty">Verificando Samples personalizados...</span>
-        <button class="btn btn-sec" style="padding:3px 9px;font-size:11px" onclick="detectRbSampler(true)">Detectar novamente</button>
+          <span id="audioMusicPill" class="audio-toggle-pill">Com músicas</span>
+        </label>
       </div>
+    </div>
 
-      <label class="check-row">
-        <input type="checkbox" id="plIncludeSamplesChk" onchange="toggleCustomSamplesRow()" />
-        <span>Incluir também uma pasta extra de Samples do meu computador (opcional)</span>
-      </label>
-      <div id="plSamplesRow" class="row hidden" style="margin:0 0 10px 25px">
-        <input type="text" id="plSamplesPath" placeholder="Selecione sua pasta extra de Samples..." />
-        <button class="btn btn-sec" onclick="pickCustomSamplesFolder()">Escolher...</button>
-        <button class="btn btn-sec" onclick="scanCustomSamplesFolder()">Listar</button>
+    <!-- DIV 3: SAMPLES -->
+    <div class="card">
+      <div class="card-head-row">
+        <div class="card-title">3. Samples</div>
+        <button type="button" class="card-collapse-btn" onclick="toggleCardCollapse('cardSamplesBody', this)" title="Minimizar ou expandir Samples" aria-label="Minimizar ou expandir">▾</button>
       </div>
-
-      <!-- Selective Samples Picker for Export -->
-      <div id="exportSamplesWrap" class="sub-panel hidden">
-        <div class="sub-panel-head">
-          <span style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--dim)">Escolher Samples personalizados para exportar</span>
-          <div class="row">
-            <button class="btn btn-sec" style="padding:4px 9px;font-size:11px" onclick="toggleAllExportSamples(true)">Todos</button>
-            <button class="btn btn-sec" style="padding:4px 9px;font-size:11px" onclick="toggleAllExportSamples(false)">Limpar</button>
-          </div>
+      <div id="cardSamplesBody">
+        <div class="sampler-meta">
+          <span id="rbSamplerBadge" class="badge empty">Verificando Samples personalizados...</span>
+          <button class="btn btn-sec" style="padding:3px 9px;font-size:11px" onclick="detectRbSampler(true)">Detectar novamente</button>
         </div>
-        <input type="search" id="exportSamplesSearch" placeholder="Filtrar samples por nome ou banco..." oninput="renderExportSamplesList()" style="margin-bottom:4px" />
-        <div id="exportSamplesBox" class="pl-box" style="max-height:175px"></div>
-        <div id="exportSamplesSummary" style="font-size:11.5px;color:var(--muted);margin-bottom:6px"></div>
-        <label id="audioSamplesCard" class="audio-toggle-card" style="margin:6px 0 0 0">
+
+        <!-- Selective Samples Picker for Export -->
+        <div id="exportSamplesWrap" class="sub-panel hidden" style="margin-bottom:10px">
+          <div class="sub-panel-head">
+            <span style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--dim)">Escolher Samples personalizados para exportar</span>
+            <div class="row">
+              <button class="btn btn-sec" style="padding:4px 9px;font-size:11px" onclick="toggleAllExportSamples(true)">Todos</button>
+              <button class="btn btn-sec" style="padding:4px 9px;font-size:11px" onclick="toggleAllExportSamples(false)">Limpar</button>
+            </div>
+          </div>
+          <input type="search" id="exportSamplesSearch" placeholder="Filtrar samples por nome ou banco..." oninput="renderExportSamplesList()" style="margin-bottom:4px" />
+          <div id="exportSamplesBox" class="pl-box" style="max-height:175px"></div>
+          <div id="exportSamplesSummary" style="font-size:11.5px;color:var(--muted);margin-bottom:0"></div>
+        </div>
+
+        <label class="check-row">
+          <input type="checkbox" id="plIncludeSamplesChk" onchange="toggleCustomSamplesRow()" />
+          <span>Incluir também uma pasta extra de Samples do meu computador (opcional)</span>
+        </label>
+        <div id="plSamplesRow" class="row hidden" style="margin:0 0 10px 25px">
+          <input type="text" id="plSamplesPath" placeholder="Selecione sua pasta extra de Samples..." />
+          <button class="btn btn-sec" onclick="pickCustomSamplesFolder()">Escolher...</button>
+          <button class="btn btn-sec" onclick="scanCustomSamplesFolder()">Listar</button>
+        </div>
+
+        <label id="audioSamplesCard" class="audio-toggle-card" style="margin:8px 0 0 0">
           <span class="audio-toggle-left">
             <input type="checkbox" id="plIncludeSamplesAudio" checked onchange="syncAudioToggleCards()" />
             <span>
@@ -670,59 +775,15 @@
           <span id="audioSamplesPill" class="audio-toggle-pill">Com áudios</span>
         </label>
       </div>
+    </div>
 
-      <!-- Configurações extras do Rekordbox (Preferências, Efeitos, MIDI) -->
-      <div class="sub-panel" style="margin:10px 0 12px 0">
-        <div class="sub-panel-head" style="margin-bottom:8px">
-          <span style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--dim)">Configurações do Rekordbox (opcional)</span>
-          <span id="rbExtrasBadge" class="badge empty">Detectando...</span>
-        </div>
-        <label class="check-row" style="margin-bottom:6px">
-          <input type="checkbox" id="plIncludeRbPrefs" onchange="updateExportSizeEstimate()" />
-          <span>Incluir <strong>Preferências do Rekordbox</strong> <span id="rbPrefsCountLbl" style="color:var(--dim);font-size:11.5px"></span></span>
-        </label>
-        <label class="check-row" style="margin-bottom:6px">
-          <input type="checkbox" id="plIncludeRbFx" onchange="updateExportSizeEstimate()" />
-          <span>Incluir <strong>Efeitos configurados</strong> (FX Units, Pad FX, Beat FX) <span id="rbFxCountLbl" style="color:var(--dim);font-size:11.5px"></span></span>
-        </label>
-        <label class="check-row" style="margin-bottom:0">
-          <input type="checkbox" id="plIncludeRbMidi" onchange="updateExportSizeEstimate()" />
-          <span>Incluir <strong>Configurações de MIDI</strong> (mapeamentos e atalhos) <span id="rbMidiCountLbl" style="color:var(--dim);font-size:11.5px"></span></span>
-        </label>
-      </div>
-
-      <!-- Atribuição de Tags do Pacote -->
-      <div class="sub-panel" style="margin:0 0 14px 0">
-        <div class="sub-panel-head" style="margin-bottom:8px">
-          <span style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--dim)">Tags do Pacote</span>
-          <div class="row" style="gap:6px">
-            <button type="button" class="btn btn-sec" style="padding:3px 8px;font-size:11px" onclick="openGalleryTagsModal()" title="Personalizar cores e gerenciar tags">🎨 Cores das tags</button>
-            <span id="expTagsCountBadge" class="badge empty">0 selecionada(s)</span>
-          </div>
-        </div>
-        <div id="expTagsChipsWrap" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px"></div>
-        <div class="row" style="max-width:380px">
-          <input type="text" id="expNewTagInput" placeholder="Criar nova tag personalizada..." onkeydown="if(event.key==='Enter') addExportTag()" />
-          <button class="btn btn-sec" style="padding:7px 11px;font-size:12px" onclick="addExportTag()">+ Tag</button>
-        </div>
-      </div>
-
-      <div id="exportSizeEstBar" class="size-est-bar">
-        <div>
-          <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--dim)">Tamanho estimado do pacote</div>
-          <div id="exportSizeEstSub" class="size-est-sub">Selecione playlists, samples ou configurações para calcular</div>
-        </div>
-        <div id="exportSizeEstVal" class="size-est-val">~0 MB</div>
-      </div>
-
+    <div style="margin-bottom:14px">
       <button id="btnRunExport" class="btn btn-primary btn-full" onclick="runExportPlaylists()">Exportar Pacote</button>
-
       <div id="exportProgressWrap" class="prog-wrap hidden">
         <div class="prog-track">
           <div id="exportProgressFill" class="prog-fill"></div>
           <span id="exportProgressLabel" class="prog-label">0%</span>
         </div>
-      </div>
       </div>
     </div>
   </section>
@@ -735,10 +796,19 @@
 
     <div class="card">
       <div class="card-title">1. Selecionar Pacote (.zip)</div>
+      <div id="importDropZone" class="drop-zone" onclick="pickPackForImport('zip')" ondragenter="onImportDragOver(event)" ondragover="onImportDragOver(event)" ondragleave="onImportDragLeave(event)" ondrop="onImportDrop(event)">
+        <div class="drop-zone-icon">📦</div>
+        <div class="drop-zone-title">Arraste e solte o pacote (.zip) aqui</div>
+        <div class="drop-zone-sub">ou clique nesta área para escolher um arquivo no seu computador</div>
+      </div>
       <div class="row">
-        <input type="text" id="plImportSource" placeholder="Escolha o .zip de playlists..." />
+        <input type="text" id="plImportSource" placeholder="Ou selecione o caminho do pacote .zip..." />
         <button class="btn btn-sec" onclick="pickPackForImport('zip')">Arquivo .zip</button>
         <button class="btn btn-sec adv-only" onclick="pickPackForImport('xml')">Arquivo .xml</button>
+      </div>
+      <div id="importPackDescWrap" class="hidden" style="margin-top:10px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--dim);margin-bottom:4px">Descrição do Pacote</div>
+        <div id="importPackDescBox" class="desc-preview-box"></div>
       </div>
 
       <div id="plImportListWrap" class="hidden" style="margin-top:14px">
@@ -983,7 +1053,7 @@
           <button id="btnCheckUpdatesNow" class="btn btn-sec" style="padding:5px 11px;font-size:12px" onclick="checkUpdatesManual()">↻ Procurar atualizações</button>
         </div>
         <div id="cfgUpdateStatusBox" style="background:var(--surface-3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:12.5px;color:var(--muted)">
-          Versão instalada: <strong style="color:var(--text)" id="cfgCurVerText">v0.3.1</strong> • Repositório: <code>DyFuchs/rb-vault</code>
+          Versão instalada: <strong style="color:var(--text)" id="cfgCurVerText">v0.3.2</strong> • Repositório: <code>DyFuchs/rb-vault</code>
         </div>
         <div style="font-size:11.5px;color:var(--dim);margin-bottom:6px">Versões baixadas neste computador:</div>
         <div id="cfgDownloadedUpdatesList"></div>
@@ -1052,6 +1122,10 @@
       <button class="btn btn-sec" style="padding:4px 10px" onclick="closeGalleryDetail()">✕</button>
     </div>
     <div class="modal-body-pad" style="gap:14px">
+      <div id="galDetDescWrap" class="hidden">
+        <div class="card-title" style="margin-bottom:6px">Descrição do Pacote</div>
+        <div id="galDetDescBox" class="desc-preview-box"></div>
+      </div>
       <!-- Tags deste pacote -->
       <div>
         <div class="card-title" style="margin-bottom:6px">Tags do Pacote (clique para ativar/remover)</div>
@@ -1369,6 +1443,152 @@ function getTagChipStyle(tagName, active = true) {
   return `border-color:${hexToRgba(hex, 0.45)};color:${hex};`;
 }
 
+
+/* ---- Descrição Rich Text do Pacote (Item 49) ---- */
+const PACK_DESC_MAX = 3000;
+
+function togglePackDescEditor() {
+  const chk = document.getElementById('plAddDescChk');
+  const wrap = document.getElementById('plPackDescWrap');
+  if (!chk || !wrap) return;
+  wrap.classList.toggle('hidden', !chk.checked);
+  if (chk.checked) {
+    const ed = document.getElementById('plPackDescEditor');
+    if (ed) ed.focus();
+  }
+}
+
+function execDescCmd(cmd) {
+  const ed = document.getElementById('plPackDescEditor');
+  if (!ed) return;
+  ed.focus();
+  document.execCommand(cmd, false, null);
+  enforcePackDescLimit();
+}
+
+function execDescColor(hex) {
+  const ed = document.getElementById('plPackDescEditor');
+  if (!ed) return;
+  ed.focus();
+  document.execCommand('styleWithCSS', false, true);
+  document.execCommand('foreColor', false, hex);
+  const cp = document.getElementById('descColorPicker');
+  if (cp && /^#[0-9a-f]{6}$/i.test(hex)) cp.value = hex;
+  enforcePackDescLimit();
+}
+
+function sanitizeDescHtml(rawHtml) {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = String(rawHtml || '');
+  const allowed = new Set(['B', 'STRONG', 'I', 'EM', 'U', 'SPAN', 'FONT', 'BR', 'DIV', 'P']);
+  const walk = node => {
+    Array.from(node.childNodes).forEach(ch => {
+      if (ch.nodeType === 1) {
+        if (!allowed.has(ch.tagName)) {
+          const span = document.createElement('span');
+          span.textContent = ch.textContent || '';
+          ch.replaceWith(span);
+          return;
+        }
+        Array.from(ch.attributes).forEach(a => {
+          const an = a.name.toLowerCase();
+          if (an === 'style') {
+            const m = /color\s*:\s*([^;]+)/i.exec(a.value || '');
+            if (m) ch.setAttribute('style', 'color:' + m[1].trim());
+            else ch.removeAttribute('style');
+          } else if (an === 'color' && ch.tagName === 'FONT') {
+            // keep font color
+          } else {
+            ch.removeAttribute(a.name);
+          }
+        });
+        walk(ch);
+      } else if (ch.nodeType === 8) {
+        ch.remove();
+      }
+    });
+  };
+  walk(tmp);
+  return tmp.innerHTML;
+}
+
+function enforcePackDescLimit() {
+  const ed = document.getElementById('plPackDescEditor');
+  const cnt = document.getElementById('plPackDescCounter');
+  if (!ed || !cnt) return;
+  let txt = ed.innerText || '';
+  if (txt.length > PACK_DESC_MAX) {
+    ed.innerText = txt.slice(0, PACK_DESC_MAX);
+    txt = ed.innerText;
+    const range = document.createRange();
+    range.selectNodeContents(ed);
+    range.collapse(false);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+  cnt.textContent = `${txt.length} / ${PACK_DESC_MAX} caracteres`;
+  cnt.className = 'desc-counter' + (txt.length >= PACK_DESC_MAX ? ' at-limit' : (txt.length >= 2700 ? ' near-limit' : ''));
+}
+
+function handlePackDescPaste(ev) {
+  ev.preventDefault();
+  const ed = document.getElementById('plPackDescEditor');
+  if (!ed) return;
+  const clip = (ev.clipboardData || window.clipboardData).getData('text/plain') || '';
+  const curLen = (ed.innerText || '').length;
+  const avail = Math.max(0, PACK_DESC_MAX - curLen);
+  if (avail > 0) document.execCommand('insertText', false, clip.slice(0, avail));
+  enforcePackDescLimit();
+}
+
+/* ---- Drag & Drop Import (Item 50) ---- */
+function onImportDragOver(ev) {
+  ev.preventDefault();
+  ev.stopPropagation();
+  const dz = document.getElementById('importDropZone');
+  if (dz) dz.classList.add('drag-over');
+}
+
+function onImportDragLeave(ev) {
+  ev.preventDefault();
+  ev.stopPropagation();
+  const dz = document.getElementById('importDropZone');
+  if (dz) dz.classList.remove('drag-over');
+}
+
+async function onImportDrop(ev) {
+  ev.preventDefault();
+  ev.stopPropagation();
+  const dz = document.getElementById('importDropZone');
+  if (dz) dz.classList.remove('drag-over');
+  const files = ev.dataTransfer && ev.dataTransfer.files;
+  if (!files || !files.length) return;
+  const f = files[0];
+  const lowName = (f.name || '').toLowerCase();
+  if (!lowName.endsWith('.zip') && !lowName.endsWith('.xml')) {
+    return await uiAlert('Solte um arquivo de pacote no formato .zip ou .xml.', 'Formato não suportado', 'warning');
+  }
+  const directPath = f.pywebviewFullPath || f.path || '';
+  if (directPath) {
+    return await loadImportPackByPath(directPath);
+  }
+  showBusy('Recebendo pacote arrastado...', `Carregando ${f.name}...`);
+  try {
+    const resp = await fetch('/api/xml/upload-drop', {
+      method: 'POST',
+      headers: { 'X-Filename': encodeURIComponent(f.name) },
+      body: f,
+    });
+    const data = await resp.json();
+    if (!resp.ok || !data.ok) throw new Error(data.error || 'Falha ao ler arquivo arrastado.');
+    await loadImportPackByPath(data.path);
+  } catch (e) {
+    hideBusy();
+    await uiError(e.message, 'Erro ao soltar pacote');
+  }
+}
+
 function toggleCardCollapse(bodyId, btn) {
   const el = document.getElementById(bodyId);
   if (!el) return;
@@ -1435,7 +1655,7 @@ function updateExportSizeEstimate() {
 
   if (!parts.length) {
     valEl.textContent = '~0 MB';
-    subEl.textContent = 'Selecione playlists, samples ou configurações para calcular';
+    subEl.textContent = '0 playlists • 0 faixas • 0 samples';
   } else {
     valEl.textContent = '~' + formatBytesJs(totalBytes);
     subEl.textContent = parts.join(' • ');
@@ -1962,11 +2182,22 @@ async function pickPackForImport(ext) {
     }
   }
   if (!chosen) return;
+  await loadImportPackByPath(chosen);
+}
+
+async function loadImportPackByPath(chosen) {
   showBusy('Lendo pacote...', 'Carregando playlists, samples e configurações...');
   try {
     const insp = await api('/api/xml/inspect-import', { sourcePath: chosen });
     hideBusy();
     document.getElementById('plImportSource').value = chosen;
+    const descHtml = (insp.data.packDescriptionHtml || '').trim();
+    const descWrap = document.getElementById('importPackDescWrap');
+    const descBox = document.getElementById('importPackDescBox');
+    if (descWrap && descBox) {
+      descWrap.classList.toggle('hidden', !descHtml);
+      descBox.innerHTML = descHtml ? sanitizeDescHtml(descHtml) : '';
+    }
     state.plImport = insp.data.playlists.map(p => ({ ...p, checked: true }));
     state.importSamples = (insp.data.samples || []).map(s => ({ ...s, checked: true }));
 
@@ -2177,6 +2408,8 @@ async function runExportPlaylists() {
       selectedSampleItems: selectedSamples,
       samplerGlobalProps: state.rbSamplerGlobalProps,
       packTags: state.exportTags,
+      packDescriptionHtml: (document.getElementById('plAddDescChk') && document.getElementById('plAddDescChk').checked) ? sanitizeDescHtml(document.getElementById('plPackDescEditor').innerHTML) : '',
+      packDescriptionText: (document.getElementById('plAddDescChk') && document.getElementById('plAddDescChk').checked) ? (document.getElementById('plPackDescEditor').innerText || '').slice(0, PACK_DESC_MAX) : '', 
       includeRbPrefs: finalIncPrefs,
       includeRbFx: finalIncFx,
       includeRbMidi: finalIncMidi,
@@ -2782,6 +3015,13 @@ async function openGalleryDetail(item) {
       samples: (insp.data.samples || []).map(s => ({ ...s, checked: true })),
     };
     document.getElementById('galDetTitle').textContent = item.name;
+    const gDescHtml = (insp.data.packDescriptionHtml || '').trim();
+    const gDescWrap = document.getElementById('galDetDescWrap');
+    const gDescBox = document.getElementById('galDetDescBox');
+    if (gDescWrap && gDescBox) {
+      gDescWrap.classList.toggle('hidden', !gDescHtml);
+      gDescBox.innerHTML = gDescHtml ? sanitizeDescHtml(gDescHtml) : '';
+    }
     document.getElementById('galDetSub').textContent = `${item.origin} • ${item.date} • ${item.sizeLabel} • ${item.path}`;
     renderGalDetailTags();
     renderGalDetailCustomCols();
