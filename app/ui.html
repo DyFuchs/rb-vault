@@ -1,0 +1,3163 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="studio-dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rekordbox Vault</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2338bdf8'/%3E%3Cstop offset='100%25' stop-color='%236366f1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='%230b0d12'/%3E%3Ccircle cx='32' cy='32' r='22' fill='none' stroke='url(%23g)' stroke-width='4'/%3E%3Ccircle cx='32' cy='32' r='13' fill='none' stroke='%2338bdf8' stroke-opacity='.45' stroke-width='2' stroke-dasharray='5 4'/%3E%3Ccircle cx='32' cy='32' r='6' fill='url(%23g)'/%3E%3Cpath d='M32 10v6M32 48v6M10 32h6M48 32h6' stroke='%237dd3fc' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E" />
+<style>
+  :root, html[data-theme="studio-dark"] {
+    --bg: #0b0d12;
+    --surface: #141720;
+    --surface-2: #1b202e;
+    --surface-3: #0e1118;
+    --border: #232838;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --dim: #64748b;
+    --accent: #38bdf8;
+    --accent-hover: #7dd3fc;
+    --accent-ink: #082f49;
+    --green: #10b981;
+    --amber: #f59e0b;
+    --red: #f87171;
+    --tab-active: #212738;
+    --row-hover: #161b26;
+    --modal-bg: #12151f;
+  }
+  html[data-theme="midnight-violet"] {
+    --bg: #0b0914;
+    --surface: #141122;
+    --surface-2: #1e1933;
+    --surface-3: #0e0b1a;
+    --border: #2a2344;
+    --text: #f5f3ff;
+    --muted: #a7a0c2;
+    --dim: #736b94;
+    --accent: #a78bfa;
+    --accent-hover: #c4b5fd;
+    --accent-ink: #1e1038;
+    --tab-active: #261f42;
+    --row-hover: #1b1630;
+    --modal-bg: #120f20;
+  }
+  html[data-theme="club-emerald"] {
+    --bg: #080d0b;
+    --surface: #101815;
+    --surface-2: #17241f;
+    --surface-3: #0b110f;
+    --border: #1f332b;
+    --text: #ecfdf5;
+    --muted: #8fb3a4;
+    --dim: #5e8273;
+    --accent: #10b981;
+    --accent-hover: #34d399;
+    --accent-ink: #052e16;
+    --tab-active: #1c2e27;
+    --row-hover: #14221c;
+    --modal-bg: #0e1613;
+  }
+  html[data-theme="light-minimal"] {
+    --bg: #f1f5f9;
+    --surface: #ffffff;
+    --surface-2: #e2e8f0;
+    --surface-3: #f8fafc;
+    --border: #cbd5e1;
+    --text: #0f172a;
+    --muted: #475569;
+    --dim: #64748b;
+    --accent: #0284c7;
+    --accent-hover: #0369a1;
+    --accent-ink: #ffffff;
+    --tab-active: #0f172a;
+    --row-hover: #f1f5f9;
+    --modal-bg: #ffffff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 26px 20px 44px;
+    line-height: 1.5;
+    transition: background .15s, color .15s;
+  }
+  :root { --app-max-w: 860px; --app-font-scale: 1; }
+  html { font-size: calc(16px * var(--app-font-scale, 1)); }
+  .wrap { max-width: var(--app-max-w, 860px); margin: 0 auto; transition: max-width .15s ease; }
+  .layout-ctrl-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  .layout-ctrl-row { display: flex; flex-direction: column; gap: 5px; background: var(--surface-3); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+  .layout-ctrl-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12.5px; font-weight: 600; }
+  .layout-ctrl-val { color: var(--accent); font-variant-numeric: tabular-nums; font-size: 12px; }
+  .layout-ctrl-row input[type=range] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+  .width-presets { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+  .width-preset { padding: 4px 9px; border-radius: 7px; border: 1px solid var(--border); background: var(--surface-2); color: var(--muted); font-size: 11.5px; cursor: pointer; }
+  .width-preset.active { border-color: var(--accent); color: var(--accent); background: rgba(56,189,248,.12); }
+  .audio-toggle-card {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 11px 14px; margin: 10px 0; border-radius: 11px; cursor: pointer;
+    border: 1.5px solid rgba(56,189,248,.48);
+    background: linear-gradient(135deg, rgba(56,189,248,.11), rgba(99,102,241,.07));
+    transition: border-color .15s, background .15s;
+  }
+  .audio-toggle-card.off {
+    border-color: rgba(245,158,11,.45);
+    background: rgba(245,158,11,.07);
+  }
+  .audio-toggle-card input[type=checkbox] {
+    width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0;
+  }
+  .audio-toggle-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .audio-toggle-title { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.3; }
+  .audio-toggle-sub { font-size: 11.5px; color: var(--muted); line-height: 1.3; margin-top: 2px; }
+  .audio-toggle-pill {
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+    padding: 4px 9px; border-radius: 999px; white-space: nowrap; flex-shrink: 0;
+    background: rgba(56,189,248,.18); color: var(--accent); border: 1px solid rgba(56,189,248,.35);
+  }
+  .audio-toggle-card.off .audio-toggle-pill {
+    background: rgba(245,158,11,.18); color: var(--amber); border-color: rgba(245,158,11,.4);
+  }
+  .busy-overlay { position: fixed; inset: 0; background: rgba(5,8,15,.72); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+  .busy-box { background: var(--modal-bg); border: 1px solid var(--border); border-radius: 14px; padding: 22px 26px; width: min(390px, 90vw); text-align: center; box-shadow: 0 24px 60px rgba(0,0,0,.55); }
+  .busy-spinner { width: 34px; height: 34px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; margin: 0 auto 12px; animation: vspin .8s linear infinite; }
+  @keyframes vspin { to { transform: rotate(360deg); } }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    margin-bottom: 20px; flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 11px; }
+  .dot-brand { width: 11px; height: 11px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+  .brand h1 { font-size: 21px; font-weight: 700; letter-spacing: -0.02em; }
+  .topbar-quote {
+    flex: 1 1 200px;
+    max-width: 340px;
+    margin: 0 12px;
+    font-style: italic;
+    font-size: 11.5px;
+    line-height: 1.35;
+    color: var(--muted);
+    text-align: center;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+    opacity: .9;
+  }
+  @media (max-width: 720px) {
+    .topbar-quote { order: 3; flex: 1 1 100%; max-width: 100%; margin: 6px 0 0; text-align: left; }
+  }
+  .mode-pill {
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+    padding: 2px 8px; border-radius: 999px;
+    background: var(--surface-2); color: var(--accent); border: 1px solid var(--border);
+  }
+
+  .rb-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 6px 11px; border-radius: 999px; font-size: 12px; font-weight: 600;
+    border: 1px solid #1e4739; background: #10241d; color: #34d399;
+  }
+  .status-pill.open { border-color: #78350f; background: #2b1f0e; color: #fbbf24; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+  .status-pill.open .status-dot { background: var(--amber); }
+
+  .icon-btn {
+    position: relative;
+    width: 34px; height: 34px; padding: 0;
+    border-radius: 9px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: .15s; flex-shrink: 0;
+  }
+  .icon-btn svg { width: 16px; height: 16px; display: block; }
+  .icon-btn:hover { color: var(--text); border-color: var(--accent); }
+  .icon-btn.open-rb:hover { border-color: #10b981; color: #34d399; background: #10241d; }
+  .icon-btn.restart-rb:hover { border-color: #f59e0b; color: #fbbf24; background: #2b1f0e; }
+  .icon-btn.close-rb:hover { border-color: #ef4444; color: #f87171; background: #2a1418; }
+  .icon-btn.settings-btn.active { border-color: var(--accent); color: var(--accent); }
+  .icon-btn[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute; top: calc(100% + 8px); left: 50%;
+    transform: translateX(-50%) translateY(-3px);
+    background: #090b10; color: #f8fafc;
+    border: 1px solid #2d3448; border-radius: 7px;
+    padding: 4px 9px; font-size: 11.5px; font-weight: 600;
+    white-space: nowrap; opacity: 0; pointer-events: none;
+    transition: opacity .14s ease, transform .14s ease;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.45); z-index: 60;
+  }
+  .icon-btn[data-tip]:hover::after,
+  .icon-btn[data-tip]:focus-visible::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .tabs {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 5px; border-radius: 12px; margin-bottom: 18px;
+  }
+  .tab {
+    background: transparent; border: none; color: var(--muted);
+    font-size: 13.5px; font-weight: 600; padding: 10px 8px; border-radius: 8px;
+    cursor: pointer; transition: .15s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { background: var(--tab-active); color: #fff; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 18px 20px; margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 11px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--dim); margin-bottom: 12px;
+  }
+  .row { display: flex; gap: 10px; align-items: center; }
+  .row-wrap { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  label.field { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+  input[type="text"], input[type="search"], select {
+    width: 100%; background: var(--surface-3); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 9px 12px; font-size: 13px; outline: none;
+  }
+  input:focus, select:focus { border-color: var(--accent); }
+  input.input-error { border-color: var(--red) !important; box-shadow: 0 0 0 2px rgba(248,113,113,0.22); }
+
+  .check-row {
+    display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px;
+    font-size: 13px; cursor: pointer; user-select: none;
+  }
+  .check-row input { margin-top: 3px; accent-color: var(--accent); width: 15px; height: 15px; flex-shrink: 0; }
+
+  .sampler-meta {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin: -4px 0 11px 25px; font-size: 12px; color: var(--muted); flex-wrap: wrap;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600;
+    background: var(--surface-2); color: var(--accent); border: 1px solid var(--border);
+  }
+  .badge.empty { color: var(--dim); }
+  .tag-bank {
+    font-size: 10.5px; color: var(--muted); background: var(--surface-2); border: 1px solid var(--border);
+    padding: 1px 6px; border-radius: 5px; white-space: nowrap;
+  }
+
+  button.btn {
+    border: none; border-radius: 9px; padding: 10px 16px;
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: .15s;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    flex-shrink: 0;
+  }
+  button.btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); }
+  .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+  .btn-sec { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); padding: 8px 13px; font-size: 12.5px; }
+  .btn-sec:hover:not(:disabled) { border-color: var(--accent); }
+  .btn-danger { background: rgba(239,68,68,.14); color: #f87171; border: 1px solid rgba(239,68,68,.35); padding: 6px 10px; font-size: 11.5px; }
+  .btn-full { width: 100%; padding: 12px; }
+
+  .pl-box {
+    max-height: 230px; overflow-y: auto; background: var(--surface-3);
+    border: 1px solid var(--border); border-radius: 10px; padding: 8px;
+    margin: 8px 0 10px;
+  }
+  .pl-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 6px 9px; border-radius: 7px; cursor: pointer; font-size: 12.5px;
+  }
+  .pl-row:hover { background: var(--row-hover); }
+  .pl-row input { accent-color: var(--accent); width: 15px; height: 15px; flex-shrink: 0; }
+  .pl-count { font-size: 11px; color: var(--dim); white-space: nowrap; }
+
+  .sub-panel {
+    margin: 8px 0 14px 0;
+    padding: 12px 14px;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+  }
+  .sub-panel-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+
+  .callout {
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 15px; font-size: 12.5px; color: var(--muted); margin-bottom: 14px;
+  }
+
+  .log-box {
+    background: var(--surface-3); border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 12px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 11.5px; color: var(--muted); height: 78px; overflow-y: auto;
+    white-space: pre-wrap;
+  }
+
+  /* Real-time Progress Bar (red 0% -> green 100%, centered % text with >=2px vertical margin) */
+  .prog-wrap {
+    width: 100%;
+    margin-top: 12px;
+  }
+  .prog-track {
+    position: relative;
+    width: 100%;
+    height: 22px;
+    padding: 2px 0;
+    border-radius: 999px;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .prog-fill {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 0%;
+    background: hsl(0, 78%, 45%);
+    transition: width .18s ease, background-color .22s ease;
+  }
+  .prog-label {
+    position: relative;
+    z-index: 2;
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.65);
+    user-select: none;
+  }
+
+  .hidden { display: none !important; }
+  body:not(.advanced-mode) .adv-only { display: none !important; }
+
+  /* Floating Modals (Explorer & Settings) */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(4, 6, 10, 0.72);
+    backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center;
+    padding: 16px; z-index: 9999;
+  }
+  .modal {
+    width: 100%; max-width: 720px; background: var(--modal-bg);
+    border: 1px solid var(--border); border-radius: 16px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.55); overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  .modal-body { display: grid; grid-template-columns: 175px 1fr; height: 420px; min-height: 0; overflow: hidden; }
+  .modal-body-pad { padding: 18px 20px; max-height: 74vh; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+  .fs-sidebar { background: var(--surface-3); border-right: 1px solid var(--border); padding: 10px; overflow-y: auto; min-height: 0; display: flex; flex-direction: column; gap: 4px; }
+  .fs-shortcut { text-align: left; background: transparent; border: none; color: var(--muted); padding: 7px 10px; border-radius: 7px; font-size: 12.5px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+  .fs-shortcut:hover { background: var(--surface-2); color: var(--text); }
+  .fs-main { display: flex; flex-direction: column; min-height: 0; overflow: hidden; padding: 10px 14px; }
+  .fs-list { flex: 1; min-height: 0; overflow-y: auto; margin-top: 8px; display: flex; flex-direction: column; gap: 3px; padding-right: 4px; }
+  .fs-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; border: 1px solid transparent; }
+  .fs-item:hover { background: var(--row-hover); }
+  .fs-item.selected { background: var(--surface-2); border-color: var(--accent); color: var(--text); }
+  .modal-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 18px; border-top: 1px solid var(--border); background: var(--surface-3); }
+
+  /* Theme Swatches & Profile Cards inside Settings Modal */
+
+  .app-version {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--dim);
+    letter-spacing: .04em;
+    margin-top: 1px;
+  }
+  .dlg-badge {
+    width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800;
+  }
+  .dlg-badge.info { background: rgba(56,189,248,.16); color: var(--accent); border: 1px solid rgba(56,189,248,.35); }
+  .dlg-badge.success { background: rgba(16,185,129,.16); color: #34d399; border: 1px solid rgba(16,185,129,.35); }
+  .dlg-badge.warning { background: rgba(245,158,11,.16); color: #fbbf24; border: 1px solid rgba(245,158,11,.35); }
+  .dlg-badge.error { background: rgba(239,68,68,.16); color: #f87171; border: 1px solid rgba(239,68,68,.35); }
+  .dlg-msg { font-size: 13px; color: var(--muted); white-space: pre-wrap; line-height: 1.55; word-break: break-word; }
+  .dlg-bullets {
+    margin: 4px 0 2px;
+    padding: 10px 14px 10px 26px;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 12.5px;
+    color: var(--text);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+
+
+  /* Gallery (Lista de Pacotes) */
+  .gal-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-3);
+  }
+  table.gal-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    text-align: left;
+  }
+  table.gal-table th {
+    padding: 9px 11px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--dim);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    white-space: nowrap;
+  }
+  table.gal-table td {
+    padding: 9px 11px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: middle;
+  }
+  table.gal-table tbody tr { cursor: pointer; transition: background .12s; }
+  table.gal-table tbody tr:hover { background: var(--row-hover); }
+  table.gal-table tbody tr:last-child td { border-bottom: none; }
+  .pill-origin {
+    display: inline-block; padding: 2px 7px; border-radius: 999px;
+    font-size: 10.5px; font-weight: 700;
+  }
+  .pill-origin.criado { background: rgba(56,189,248,.16); color: var(--accent); border: 1px solid rgba(56,189,248,.35); }
+  .pill-origin.importado { background: rgba(16,185,129,.16); color: #34d399; border: 1px solid rgba(16,185,129,.35); }
+  .tag-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600;
+    background: var(--surface-2); color: var(--accent); border: 1px solid var(--border);
+    margin: 2px 4px 2px 0; cursor: pointer;
+  }
+  .tag-chip.inactive { color: var(--dim); opacity: .7; }
+  .tag-chip.active { border-color: var(--accent); background: rgba(56,189,248,.16); }
+
+  .theme-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .theme-opt {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+    border-radius: 10px; border: 1px solid var(--border); background: var(--surface-3);
+    color: var(--text); cursor: pointer; font-size: 12.5px; font-weight: 600; text-align: left;
+  }
+  .theme-opt.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .swatch { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.2); }
+  .profile-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 9px 11px; border-radius: 9px; background: var(--surface-3); border: 1px solid var(--border);
+    margin-bottom: 7px; font-size: 12.5px;
+  }
+  .switch-line {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 14px; border-radius: 11px; background: var(--surface-3); border: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <svg class="brand-logo" viewBox="0 0 64 64" width="34" height="34" aria-hidden="true" style="flex-shrink:0">
+        <defs>
+          <linearGradient id="rvLogoGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="var(--accent)"/>
+            <stop offset="100%" stop-color="#6366f1"/>
+          </linearGradient>
+        </defs>
+        <rect width="64" height="64" rx="16" fill="var(--surface-2)" stroke="var(--border)" stroke-width="2"/>
+        <circle cx="32" cy="32" r="20" fill="none" stroke="url(#rvLogoGrad)" stroke-width="4"/>
+        <circle cx="32" cy="32" r="11.5" fill="none" stroke="var(--accent)" stroke-opacity=".45" stroke-width="2" stroke-dasharray="5 4"/>
+        <circle cx="32" cy="32" r="5.5" fill="url(#rvLogoGrad)"/>
+        <path d="M32 12v5M32 47v5M12 32h5M47 32h5" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <h1>Rekordbox Vault</h1>
+          <span id="modePill" class="mode-pill hidden">Avançado</span>
+        </div>
+        <div id="appVersionText" class="app-version">v0.3.0</div>
+      </div>
+    </div>
+
+    <div id="topbarQuote" class="topbar-quote" title="Frase aleatória da inicialização"></div>
+
+    <div class="rb-bar">
+      <div id="statusPill" class="status-pill">
+        <span class="status-dot"></span>
+        <span id="statusText">Rekordbox fechado</span>
+      </div>
+
+      <button class="icon-btn open-rb" onclick="openRekordbox()" data-tip="Abrir Rekordbox" aria-label="Abrir Rekordbox">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.53.85l10.8-6.86a1 1 0 0 0 0-1.7L9.53 4.29A1 1 0 0 0 8 5.14Z"/></svg>
+      </button>
+
+      <button class="icon-btn restart-rb" onclick="restartRekordbox()" data-tip="Reiniciar Rápido" aria-label="Reiniciar Rápido">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
+      </button>
+
+      <button class="icon-btn close-rb" onclick="closeRekordbox()" data-tip="Fechar Rekordbox" aria-label="Fechar Rekordbox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+      </button>
+
+      <button class="icon-btn" onclick="refreshStatus()" data-tip="Atualizar status" aria-label="Atualizar status">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      </button>
+
+      <button id="btnSettingsIcon" class="icon-btn settings-btn" onclick="openSettingsModal()" data-tip="Configurações" aria-label="Configurações">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="export" onclick="switchTab('export')">Exportar Pacote</button>
+    <button class="tab" data-tab="import" onclick="switchTab('import')">Importar Pacote</button>
+    <button class="tab" data-tab="gallery" onclick="switchTab('gallery')">Galeria</button>
+  </div>
+
+  <!-- ==================== ABA 1: EXPORTAR PLAYLISTS ==================== -->
+  <section id="tab-export">
+    <div class="card">
+      <div class="card-title">1. Suas playlists do Rekordbox</div>
+
+      <div id="autoLoadBanner" style="font-size:12.5px;color:var(--muted);margin-bottom:10px" class="hidden"></div>
+
+      <div class="row-wrap" style="margin-bottom:10px">
+        <button id="btnDirectReadDb" class="btn btn-primary" onclick="loadDirectFromRekordboxDb(false)">⚡ Ler playlists direto do Rekordbox</button>
+        <button id="btnSetupDirectDb" class="btn btn-sec hidden" onclick="setupDirectDbReader()">Ativar leitura direta (1 clique)</button>
+        <button class="btn btn-sec adv-only" onclick="exportAutoXmlToFolder()">Salvar XML completo...</button>
+      </div>
+      <div class="row">
+        <input type="text" id="plExportXmlPath" placeholder="Ou selecione/cole um arquivo rekordbox.xml manual..." />
+        <button class="btn btn-sec" onclick="pickXmlForExport()">Escolher XML</button>
+        <button class="btn btn-sec" onclick="loadXmlFromInput()">Carregar</button>
+      </div>
+
+      <div id="plExportListWrap" class="hidden" style="margin-top:10px">
+        <div class="row" style="justify-content:space-between;margin-bottom:6px">
+          <input type="search" id="plExportSearch" placeholder="Filtrar playlists..." oninput="renderPlList('export')" style="max-width:280px" />
+          <div class="row">
+            <button class="btn btn-sec" style="padding:5px 10px;font-size:11.5px" onclick="loadDirectFromRekordboxDb(false)" title="Recarregar playlists do Rekordbox">↻</button>
+            <button class="btn btn-sec" style="padding:5px 10px;font-size:11.5px" onclick="toggleAllPl('export', true)">Todas</button>
+            <button class="btn btn-sec" style="padding:5px 10px;font-size:11.5px" onclick="toggleAllPl('export', false)">Limpar</button>
+          </div>
+        </div>
+        <div id="plExportBox" class="pl-box"></div>
+        <div id="plExportSummary" style="font-size:12px;color:var(--muted)"></div>
+      </div>
+
+      <div id="readProgressWrap" class="prog-wrap hidden">
+        <div class="prog-track">
+          <div id="readProgressFill" class="prog-fill"></div>
+          <span id="readProgressLabel" class="prog-label">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">2. Gerar Pacote (.zip)</div>
+      <div class="grid-2" style="margin-bottom:12px">
+        <div>
+          <label class="field">Nome do pacote <span style="color:var(--red)">*</span></label>
+          <input type="text" id="plPackName" value="" placeholder="Digite um nome para este pacote..." oninput="this.classList.remove('input-error')" />
+        </div>
+        <div>
+          <label class="field">Pasta de destino</label>
+          <div class="row">
+            <input type="text" id="plExportDest" />
+            <button class="btn btn-sec" onclick="pickFolderInto('plExportDest')">Alterar...</button>
+          </div>
+        </div>
+      </div>
+
+      <label id="audioMusicCard" class="audio-toggle-card">
+        <span class="audio-toggle-left">
+          <input type="checkbox" id="plIncludeAudio" checked onchange="syncAudioToggleCards()" />
+          <span>
+            <div class="audio-toggle-title">Copiar também os arquivos de música (MP3/WAV/AIFF)</div>
+            <div class="audio-toggle-sub">Inclui os áudios das playlists escolhidas dentro do pacote .zip</div>
+          </span>
+        </span>
+        <span id="audioMusicPill" class="audio-toggle-pill">Com músicas</span>
+      </label>
+
+      <div class="sampler-meta">
+        <span id="rbSamplerBadge" class="badge empty">Verificando Samples personalizados...</span>
+        <button class="btn btn-sec" style="padding:3px 9px;font-size:11px" onclick="detectRbSampler(true)">Detectar novamente</button>
+      </div>
+
+      <label class="check-row">
+        <input type="checkbox" id="plIncludeSamplesChk" onchange="toggleCustomSamplesRow()" />
+        <span>Incluir também uma pasta extra de Samples do meu computador (opcional)</span>
+      </label>
+      <div id="plSamplesRow" class="row hidden" style="margin:0 0 10px 25px">
+        <input type="text" id="plSamplesPath" placeholder="Selecione sua pasta extra de Samples..." />
+        <button class="btn btn-sec" onclick="pickCustomSamplesFolder()">Escolher...</button>
+        <button class="btn btn-sec" onclick="scanCustomSamplesFolder()">Listar</button>
+      </div>
+
+      <!-- Selective Samples Picker for Export -->
+      <div id="exportSamplesWrap" class="sub-panel hidden">
+        <div class="sub-panel-head">
+          <span style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--dim)">Escolher Samples personalizados para exportar</span>
+          <div class="row">
+            <button class="btn btn-sec" style="padding:4px 9px;font-size:11px" onclick="toggleAllExportSamples(true)">Todos</button>
+            <button class="btn btn-sec" style="padding:4px 9px;font-size:11px" onclick="toggleAllExportSamples(false)">Limpar</button>
+          </div>
+        </div>
+        <input type="search" id="exportSamplesSearch" placeholder="Filtrar samples por nome ou banco..." oninput="renderExportSamplesList()" style="margin-bottom:4px" />
+        <div id="exportSamplesBox" class="pl-box" style="max-height:175px"></div>
+        <div id="exportSamplesSummary" style="font-size:11.5px;color:var(--muted);margin-bottom:6px"></div>
+        <label id="audioSamplesCard" class="audio-toggle-card" style="margin:6px 0 0 0">
+          <span class="audio-toggle-left">
+            <input type="checkbox" id="plIncludeSamplesAudio" checked onchange="syncAudioToggleCards()" />
+            <span>
+              <div class="audio-toggle-title">Incluir também os arquivos de áudio dos Samples</div>
+              <div class="audio-toggle-sub">Desmarque para exportar apenas as configurações (BPM, beatgrid, gain, loop, sync e pads)</div>
+            </span>
+          </span>
+          <span id="audioSamplesPill" class="audio-toggle-pill">Com áudios</span>
+        </label>
+      </div>
+
+      <!-- Configurações extras do Rekordbox (Preferências, Efeitos, MIDI) -->
+      <div class="sub-panel" style="margin:10px 0 12px 0">
+        <div class="sub-panel-head" style="margin-bottom:8px">
+          <span style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--dim)">Configurações do Rekordbox (opcional)</span>
+          <span id="rbExtrasBadge" class="badge empty">Detectando...</span>
+        </div>
+        <label class="check-row" style="margin-bottom:6px">
+          <input type="checkbox" id="plIncludeRbPrefs" />
+          <span>Incluir <strong>Preferências do Rekordbox</strong> <span id="rbPrefsCountLbl" style="color:var(--dim);font-size:11.5px"></span></span>
+        </label>
+        <label class="check-row" style="margin-bottom:6px">
+          <input type="checkbox" id="plIncludeRbFx" />
+          <span>Incluir <strong>Efeitos configurados</strong> (FX Units, Pad FX, Beat FX) <span id="rbFxCountLbl" style="color:var(--dim);font-size:11.5px"></span></span>
+        </label>
+        <label class="check-row" style="margin-bottom:0">
+          <input type="checkbox" id="plIncludeRbMidi" />
+          <span>Incluir <strong>Configurações de MIDI</strong> (mapeamentos e atalhos) <span id="rbMidiCountLbl" style="color:var(--dim);font-size:11.5px"></span></span>
+        </label>
+      </div>
+
+      <!-- Atribuição de Tags do Pacote -->
+      <div class="sub-panel" style="margin:0 0 14px 0">
+        <div class="sub-panel-head" style="margin-bottom:8px">
+          <span style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--dim)">Tags do Pacote</span>
+          <span id="expTagsCountBadge" class="badge empty">0 selecionada(s)</span>
+        </div>
+        <div id="expTagsChipsWrap" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px"></div>
+        <div class="row" style="max-width:380px">
+          <input type="text" id="expNewTagInput" placeholder="Criar nova tag personalizada..." onkeydown="if(event.key==='Enter') addExportTag()" />
+          <button class="btn btn-sec" style="padding:7px 11px;font-size:12px" onclick="addExportTag()">+ Tag</button>
+        </div>
+      </div>
+
+      <button id="btnRunExport" class="btn btn-primary btn-full" onclick="runExportPlaylists()">Exportar Pacote</button>
+
+      <div id="exportProgressWrap" class="prog-wrap hidden">
+        <div class="prog-track">
+          <div id="exportProgressFill" class="prog-fill"></div>
+          <span id="exportProgressLabel" class="prog-label">0%</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== ABA 2: IMPORTAR PLAYLISTS ==================== -->
+  <section id="tab-import" class="hidden">
+    <div class="callout">
+      Selecione o pacote <code>.zip</code> para extrair músicas e samples escolhidos, converter os caminhos automaticamente (<strong>Windows ↔ Mac</strong>) e atualizar o XML padrão e o Sampler do Rekordbox.
+    </div>
+
+    <div class="card">
+      <div class="card-title">1. Selecionar Pacote (.zip)</div>
+      <div class="row">
+        <input type="text" id="plImportSource" placeholder="Escolha o .zip de playlists..." />
+        <button class="btn btn-sec" onclick="pickPackForImport('zip')">Arquivo .zip</button>
+        <button class="btn btn-sec adv-only" onclick="pickPackForImport('xml')">Arquivo .xml</button>
+      </div>
+
+      <div id="plImportListWrap" class="hidden" style="margin-top:14px">
+        <div class="row" style="justify-content:space-between;margin-bottom:6px">
+          <input type="search" id="plImportSearch" placeholder="Filtrar playlists..." oninput="renderPlList('import')" style="max-width:280px" />
+          <div class="row">
+            <button class="btn btn-sec" style="padding:5px 10px;font-size:11.5px" onclick="toggleAllPl('import', true)">Todas</button>
+            <button class="btn btn-sec" style="padding:5px 10px;font-size:11.5px" onclick="toggleAllPl('import', false)">Limpar</button>
+          </div>
+        </div>
+        <div id="plImportBox" class="pl-box"></div>
+        <div id="plImportMeta" style="font-size:12px;color:var(--muted)"></div>
+      </div>
+
+      <div id="importSamplesWrap" class="sub-panel hidden" style="margin:14px 0 0 0">
+        <div class="sub-panel-head">
+          <span style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--dim)">Escolher Samples do pacote para importar</span>
+          <div class="row">
+            <button class="btn btn-sec" style="padding:4px 9px;font-size:11px" onclick="toggleAllImportSamples(true)">Todos</button>
+            <button class="btn btn-sec" style="padding:4px 9px;font-size:11px" onclick="toggleAllImportSamples(false)">Limpar</button>
+          </div>
+        </div>
+        <input type="search" id="importSamplesSearch" placeholder="Filtrar samples por nome ou pasta..." oninput="renderImportSamplesList()" style="margin-bottom:4px" />
+        <div id="importSamplesBox" class="pl-box" style="max-height:175px"></div>
+        <div id="importSamplesSummary" style="font-size:11.5px;color:var(--muted);margin-bottom:8px"></div>
+        <label id="applySamplerSettingsRow" class="check-row hidden" style="margin-bottom:6px">
+          <input type="checkbox" id="plApplySamplerSettings" checked />
+          <span>Aplicar edições dos pads direto no <strong>Sampler do Rekordbox</strong> (BPM, beatgrid, banco, slot, gain, loop, sync)</span>
+        </label>
+        <label id="importSamplesConfigOnlyRow" class="check-row" style="margin-bottom:0">
+          <input type="checkbox" id="plImportSamplesConfigOnly" />
+          <span><strong>Apenas as Configurações</strong> dos samples (atualizar BPM, beatgrid e pads sem recopiar áudios)</span>
+        </label>
+      </div>
+
+      <div id="importRbExtrasWrap" class="sub-panel hidden" style="margin:14px 0 0 0">
+        <div class="card-title" style="margin-bottom:8px">Configurações do Rekordbox incluídas no Pacote</div>
+        <label id="impRbPrefsRow" class="check-row hidden" style="margin-bottom:6px">
+          <input type="checkbox" id="plApplyRbPrefs" checked />
+          <span>Importar <strong>Preferências do Rekordbox</strong> (mesclagem segura sem quebrar caminhos locais)</span>
+        </label>
+        <label id="impRbFxRow" class="check-row hidden" style="margin-bottom:6px">
+          <input type="checkbox" id="plApplyRbFx" checked />
+          <span>Importar <strong>Efeitos configurados</strong> (FX Units, Pad FX, Beat FX)</span>
+        </label>
+        <label id="impRbMidiRow" class="check-row hidden" style="margin-bottom:0">
+          <input type="checkbox" id="plApplyRbMidi" checked />
+          <span>Importar <strong>Configurações de MIDI</strong></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">2. Destino neste Computador</div>
+      <div style="margin-bottom:12px">
+        <label class="field">Pasta onde salvar as músicas e Samples extraídos</label>
+        <div class="row">
+          <input type="text" id="plImportDest" />
+          <button class="btn btn-sec" onclick="pickFolderInto('plImportDest')">Alterar...</button>
+        </div>
+      </div>
+
+      <div class="grid-2 adv-only" style="margin-bottom:14px">
+        <div>
+          <label class="field">Prefixo antigo (opcional, só sem áudios)</label>
+          <input type="text" id="plOldPrefix" placeholder="Ex: C:/Users/fuchs/Music" />
+        </div>
+        <div>
+          <label class="field">Novo prefixo neste PC/Mac (opcional)</label>
+          <input type="text" id="plNewPrefix" placeholder="Ex: /Users/fuchs/Music" />
+        </div>
+      </div>
+
+      <button id="btnRunImport" class="btn btn-primary btn-full" onclick="runImportPlaylists()">Importar Selecionados</button>
+    </div>
+  </section>
+
+
+  <!-- ==================== ABA 3: GALERIA (LISTA DE PACOTES) ==================== -->
+  <section id="tab-gallery" class="hidden">
+    <div class="card">
+      <div class="row-wrap" style="justify-content:space-between;margin-bottom:12px">
+        <div class="card-title" style="margin-bottom:0">Lista de Pacotes</div>
+        <div class="row" style="gap:7px">
+          <button class="btn btn-sec" style="padding:6px 11px;font-size:12px" onclick="openGalleryColsModal()">Colunas</button>
+          <button class="btn btn-sec" style="padding:6px 11px;font-size:12px" onclick="openGalleryTagsModal()">Tags</button>
+          <button class="btn btn-primary" style="padding:6px 12px;font-size:12px" onclick="syncGallery(true)">↻ Sincronizar</button>
+        </div>
+      </div>
+
+      <!-- Pastas padrão / customizáveis da Galeria -->
+      <div class="grid-2" style="margin-bottom:14px">
+        <div>
+          <label class="field">Pasta de pacotes criados</label>
+          <div class="row">
+            <input type="text" id="galCreatedDir" />
+            <button class="btn btn-sec" style="padding:7px 11px;font-size:12px" onclick="pickGalleryFolder('galCreatedDir')">Alterar...</button>
+          </div>
+        </div>
+        <div>
+          <label class="field">Pasta de pacotes importados</label>
+          <div class="row">
+            <input type="text" id="galImportedDir" />
+            <button class="btn btn-sec" style="padding:7px 11px;font-size:12px" onclick="pickGalleryFolder('galImportedDir')">Alterar...</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de pesquisa e filtros -->
+      <div class="row-wrap" style="margin-bottom:12px;gap:8px">
+        <input type="search" id="galSearch" placeholder="Pesquisar pacotes, playlists, tags ou colunas..." oninput="renderGalleryTable()" style="flex:1;min-width:200px" />
+        <select id="galFilterOrigin" onchange="renderGalleryTable()" style="width:auto;min-width:130px">
+          <option value="all">Origem: Todas</option>
+          <option value="Criado">Criados</option>
+          <option value="Importado">Importados</option>
+        </select>
+        <select id="galFilterContent" onchange="renderGalleryTable()" style="width:auto;min-width:155px">
+          <option value="all">Conteúdo: Todos</option>
+          <option value="samples">Com Samples</option>
+          <option value="pads">Com Edições de Pads</option>
+          <option value="prefs">Com Preferências RB</option>
+          <option value="fx">Com Efeitos (FX)</option>
+          <option value="midi">Com MIDI</option>
+        </select>
+        <select id="galFilterTag" onchange="renderGalleryTable()" style="width:auto;min-width:140px">
+          <option value="all">Tag: Todas</option>
+        </select>
+      </div>
+
+      <!-- Barra de ações em lote para pacotes selecionados -->
+      <div id="galBulkBar" class="row-wrap hidden" style="justify-content:space-between;align-items:center;margin-bottom:10px;padding:8px 12px;border-radius:10px;background:var(--surface-2);border:1px solid var(--accent)">
+        <span id="galBulkCount" style="font-size:12.5px;font-weight:600;color:var(--text)">0 selecionado(s)</span>
+        <div class="row" style="gap:7px">
+          <button class="btn btn-sec" style="padding:5px 11px;font-size:12px" onclick="bulkDuplicateGalleryPacks()">⧉ Duplicar selecionados</button>
+          <button class="btn btn-danger" style="padding:5px 11px;font-size:12px" onclick="bulkDeleteGalleryPacks()">🗑️ Excluir selecionados</button>
+          <button class="btn btn-sec" style="padding:5px 10px;font-size:12px" onclick="clearGallerySelection()">Limpar</button>
+        </div>
+      </div>
+
+      <div class="gal-table-wrap">
+        <table class="gal-table">
+          <thead id="galTableHead"></thead>
+          <tbody id="galTableBody"></tbody>
+        </table>
+      </div>
+      <div id="galSummary" style="font-size:12px;color:var(--muted);margin-top:9px"></div>
+    </div>
+  </section>
+
+  <!-- LOG FOOTER (Advanced Mode) -->
+  <div id="activityCard" class="card adv-only" style="padding:12px 16px">
+    <div class="card-title" style="margin-bottom:6px">Atividade</div>
+    <div id="logBox" class="log-box"></div>
+  </div>
+</div>
+
+<!-- FLOATING SETTINGS MODAL -->
+<div id="settingsModal" class="modal-backdrop hidden" onclick="if(event.target===this) closeSettingsModal()">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-head">
+      <h3>Configurações do Rekordbox Vault</h3>
+      <button class="btn btn-sec" style="padding:4px 10px" onclick="closeSettingsModal()">✕</button>
+    </div>
+    <div class="modal-body-pad">
+      <div>
+        <div class="card-title" style="margin-bottom:8px">Modo de Interface</div>
+        <div class="switch-line">
+          <div>
+            <div style="font-size:13.5px;font-weight:600">Modo Avançado</div>
+            <div style="font-size:12px;color:var(--muted)">Exibe opções manuais de XML, pasta extra de Samples, prefixos e log de atividade.</div>
+          </div>
+          <input type="checkbox" id="cfgAdvancedToggle" style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer" onchange="onAdvancedToggleChange(this.checked)" />
+        </div>
+      </div>
+
+      <div>
+        <div class="card-title" style="margin-bottom:8px">Modo de Cor do App</div>
+        <div class="theme-grid">
+          <button class="theme-opt" data-theme-btn="studio-dark" onclick="setTheme('studio-dark')">
+            <span class="swatch" style="background:linear-gradient(135deg,#0b0d12 50%,#38bdf8 50%)"></span>Estúdio Escuro
+          </button>
+          <button class="theme-opt" data-theme-btn="midnight-violet" onclick="setTheme('midnight-violet')">
+            <span class="swatch" style="background:linear-gradient(135deg,#0b0914 50%,#a78bfa 50%)"></span>Meia-Noite Roxo
+          </button>
+          <button class="theme-opt" data-theme-btn="club-emerald" onclick="setTheme('club-emerald')">
+            <span class="swatch" style="background:linear-gradient(135deg,#080d0b 50%,#10b981 50%)"></span>Clube Neon
+          </button>
+          <button class="theme-opt" data-theme-btn="light-minimal" onclick="setTheme('light-minimal')">
+            <span class="swatch" style="background:linear-gradient(135deg,#f1f5f9 50%,#0284c7 50%)"></span>Claro Minimal
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div class="card-title" style="margin-bottom:0">Tamanho da Fonte, Zoom e Largura</div>
+          <button class="btn btn-sec" style="padding:4px 9px;font-size:11.5px" onclick="resetDisplayPrefs()">Restaurar padrão</button>
+        </div>
+        <div class="layout-ctrl-grid">
+          <div class="layout-ctrl-row">
+            <div class="layout-ctrl-top">
+              <span>Tamanho da fonte</span>
+              <span id="cfgFontScaleVal" class="layout-ctrl-val">100%</span>
+            </div>
+            <input type="range" id="cfgFontScale" min="85" max="130" step="5" value="100" oninput="onDisplayPrefChange()" />
+          </div>
+          <div class="layout-ctrl-row">
+            <div class="layout-ctrl-top">
+              <span>Zoom geral do app</span>
+              <span id="cfgAppZoomVal" class="layout-ctrl-val">100%</span>
+            </div>
+            <input type="range" id="cfgAppZoom" min="75" max="130" step="5" value="100" oninput="onDisplayPrefChange()" />
+          </div>
+          <div class="layout-ctrl-row">
+            <div class="layout-ctrl-top">
+              <span>Largura do app</span>
+              <span id="cfgAppWidthVal" class="layout-ctrl-val">860px</span>
+            </div>
+            <input type="range" id="cfgAppWidth" min="760" max="1600" step="40" value="860" oninput="onDisplayPrefChange()" />
+            <div class="width-presets">
+              <button class="width-preset" data-w-preset="860" onclick="setAppWidthPreset(860)">Padrão (860px)</button>
+              <button class="width-preset" data-w-preset="1080" onclick="setAppWidthPreset(1080)">Média (1080px)</button>
+              <button class="width-preset" data-w-preset="1320" onclick="setAppWidthPreset(1320)">Larga (1320px)</button>
+              <button class="width-preset" data-w-preset="0" onclick="setAppWidthPreset(0)">Tela cheia (100%)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card-title" style="margin-bottom:8px">Perfis de Configurações Salvas</div>
+        <div class="row" style="margin-bottom:10px">
+          <input type="text" id="cfgProfileName" placeholder="Nome do perfil (ex: Notebook Win, MacBook Show)..." />
+          <button class="btn btn-primary" style="padding:8px 14px;font-size:12.5px" onclick="saveCurrentProfile()">Salvar Perfil</button>
+        </div>
+        <div id="cfgProfilesList"></div>
+      </div>
+
+      <div>
+        <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div class="card-title" style="margin-bottom:0">Atualizações &amp; Versões (GitHub)</div>
+          <button id="btnCheckUpdatesNow" class="btn btn-sec" style="padding:5px 11px;font-size:12px" onclick="checkUpdatesManual()">↻ Procurar atualizações</button>
+        </div>
+        <div id="cfgUpdateStatusBox" style="background:var(--surface-3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:12.5px;color:var(--muted)">
+          Versão instalada: <strong style="color:var(--text)" id="cfgCurVerText">v0.3.0</strong> • Repositório: <code>DyFuchs/rb-vault</code>
+        </div>
+        <div style="font-size:11.5px;color:var(--dim);margin-bottom:6px">Versões baixadas neste computador:</div>
+        <div id="cfgDownloadedUpdatesList"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span style="font-size:11.5px;color:var(--dim)">Salvo automaticamente neste computador</span>
+      <button class="btn btn-primary" onclick="closeSettingsModal()">Concluir</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- BUSY PROCESSING OVERLAY -->
+<div id="busyOverlay" class="busy-overlay hidden">
+  <div class="busy-box">
+    <div class="busy-spinner"></div>
+    <div id="busyTitle" style="font-size:14.5px;font-weight:700;margin-bottom:4px">Processando...</div>
+    <div id="busySub" style="font-size:12.5px;color:var(--muted)">Aguarde alguns instantes.</div>
+  </div>
+</div>
+
+<!-- FAST BUILT-IN EXPLORER MODAL -->
+<div id="fsModal" class="modal-backdrop hidden">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="fsModalTitle">Selecionar pasta</h3>
+      <button class="btn btn-sec" style="padding:4px 10px" onclick="closeFsModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="fsShortcuts" class="fs-sidebar"></div>
+      <div class="fs-main">
+        <div class="row">
+          <button id="fsUpBtn" class="btn btn-sec" style="padding:7px 10px" onclick="fsGoUp()">↑ Voltar</button>
+          <input type="text" id="fsPathBar" onkeydown="if(event.key==='Enter') fsNavigate(this.value)" />
+          <button class="btn btn-sec" style="padding:7px 10px" onclick="fsNavigate(document.getElementById('fsPathBar').value)">Ir</button>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <input type="search" id="fsFilterInput" placeholder="Filtrar arquivos ou pastas aqui..." oninput="renderFsItems()" />
+          <span id="fsCountBadge" style="font-size:11.5px;color:var(--dim);white-space:nowrap"></span>
+        </div>
+        <div id="fsList" class="fs-list"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span id="fsSelectionLabel" style="font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:300px"></span>
+      <div class="row">
+        <button class="btn btn-sec" style="font-size:11.5px;padding:7px 10px" onclick="useNativeOsPicker()">Janela do sistema</button>
+        <button class="btn btn-sec" onclick="closeFsModal()">Cancelar</button>
+        <button id="fsConfirmBtn" class="btn btn-primary" onclick="confirmFsModal()">Selecionar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- GALLERY: PACKAGE DETAIL & SELECTIVE IMPORT MODAL -->
+<div id="galDetailModal" class="modal-backdrop hidden" onclick="if(event.target===this) closeGalleryDetail()">
+  <div class="modal" style="max-width:740px">
+    <div class="modal-head">
+      <div>
+        <h3 id="galDetTitle" style="font-size:16px">Detalhes do Pacote</h3>
+        <div id="galDetSub" style="font-size:11.5px;color:var(--dim);margin-top:2px"></div>
+      </div>
+      <button class="btn btn-sec" style="padding:4px 10px" onclick="closeGalleryDetail()">✕</button>
+    </div>
+    <div class="modal-body-pad" style="gap:14px">
+      <!-- Tags deste pacote -->
+      <div>
+        <div class="card-title" style="margin-bottom:6px">Tags do Pacote (clique para ativar/remover)</div>
+        <div id="galDetTagsWrap" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px"></div>
+        <div class="row" style="max-width:360px">
+          <input type="text" id="galDetNewTag" placeholder="Nova tag rápida..." onkeydown="if(event.key==='Enter') addQuickTagToDetail()" />
+          <button class="btn btn-sec" style="padding:7px 11px;font-size:12px" onclick="addQuickTagToDetail()">+ Tag</button>
+        </div>
+      </div>
+
+      <!-- Colunas personalizadas deste pacote -->
+      <div id="galDetCustomColsWrap" class="hidden">
+        <div class="card-title" style="margin-bottom:6px">Campos Personalizados</div>
+        <div id="galDetCustomColsFields" class="grid-2"></div>
+      </div>
+
+      <!-- Playlists contidas no pacote -->
+      <div id="galDetPlWrap">
+        <div class="sub-panel-head">
+          <span class="card-title" style="margin-bottom:0">Playlists no Pacote</span>
+          <div class="row" style="gap:6px">
+            <button class="btn btn-sec" style="padding:4px 9px;font-size:11px" onclick="toggleAllGalDet('pl', true)">Todas</button>
+            <button class="btn btn-sec" style="padding:4px 9px;font-size:11px" onclick="toggleAllGalDet('pl', false)">Limpar</button>
+          </div>
+        </div>
+        <div id="galDetPlBox" class="pl-box" style="max-height:150px"></div>
+      </div>
+
+      <!-- Samples contidos no pacote -->
+      <div id="galDetSampWrap" class="hidden">
+        <div class="sub-panel-head">
+          <span class="card-title" style="margin-bottom:0">Samples no Pacote</span>
+          <div class="row" style="gap:6px">
+            <button class="btn btn-sec" style="padding:4px 9px;font-size:11px" onclick="toggleAllGalDet('samp', true)">Todos</button>
+            <button class="btn btn-sec" style="padding:4px 9px;font-size:11px" onclick="toggleAllGalDet('samp', false)">Limpar</button>
+          </div>
+        </div>
+        <div id="galDetSampBox" class="pl-box" style="max-height:150px"></div>
+        <label id="galDetApplyPadsRow" class="check-row hidden" style="margin-bottom:6px">
+          <input type="checkbox" id="galDetApplyPads" checked />
+          <span>Aplicar edições dos pads no <strong>Sampler do Rekordbox</strong> (BPM, beatgrid, gain, loop, sync)</span>
+        </label>
+        <label id="galDetSamplesConfigOnlyRow" class="check-row" style="margin-bottom:0">
+          <input type="checkbox" id="galDetSamplesConfigOnly" />
+          <span><strong>Apenas as Configurações</strong> dos samples (atualizar BPM, beatgrid e pads sem recopiar áudios)</span>
+        </label>
+      </div>
+
+      <div id="galDetRbExtrasWrap" class="sub-panel hidden" style="margin:0">
+        <div class="card-title" style="margin-bottom:8px">Configurações do Rekordbox neste Pacote</div>
+        <label id="galDetPrefsRow" class="check-row hidden" style="margin-bottom:6px">
+          <input type="checkbox" id="galDetApplyPrefs" checked />
+          <span>Importar <strong>Preferências do Rekordbox</strong></span>
+        </label>
+        <label id="galDetFxRow" class="check-row hidden" style="margin-bottom:6px">
+          <input type="checkbox" id="galDetApplyFx" checked />
+          <span>Importar <strong>Efeitos configurados</strong> (FX / Pad FX)</span>
+        </label>
+        <label id="galDetMidiRow" class="check-row hidden" style="margin-bottom:0">
+          <input type="checkbox" id="galDetApplyMidi" checked />
+          <span>Importar <strong>Configurações de MIDI</strong></span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-foot" style="flex-wrap:wrap">
+      <button class="btn btn-sec" style="font-size:12px" onclick="revealCurrentGalleryPack()">Mostrar na pasta</button>
+      <div class="row" style="gap:8px;flex-wrap:wrap">
+        <button class="btn btn-sec" onclick="closeGalleryDetail()">Fechar</button>
+        <button id="btnGalReloadState" class="btn btn-sec" style="border-color:var(--accent);color:var(--accent)" onclick="runImportFromGallery(true)" title="Recarrega configs, BPM, beatgrid, pads e playlists direto no Rekordbox sem recopiar áudios (Save State)">⚡ Recarregar (Save State)</button>
+        <button id="btnGalImportSelected" class="btn btn-primary" onclick="runImportFromGallery(false)">Importar Selecionados</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GALLERY: COLUMNS MANAGER MODAL -->
+<div id="galColsModal" class="modal-backdrop hidden" onclick="if(event.target===this) closeGalleryColsModal()">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-head">
+      <h3>Configurar Colunas da Lista</h3>
+      <button class="btn btn-sec" style="padding:4px 10px" onclick="closeGalleryColsModal()">✕</button>
+    </div>
+    <div class="modal-body-pad" style="gap:14px">
+      <div>
+        <div class="card-title" style="margin-bottom:8px">Colunas Padrão</div>
+        <div id="galStdColsList"></div>
+      </div>
+      <div>
+        <div class="card-title" style="margin-bottom:8px">Colunas Personalizadas</div>
+        <div class="row" style="margin-bottom:10px">
+          <input type="text" id="galNewColName" placeholder="Nome da coluna (ex: Festa, BPM Médio, Notas)..." onkeydown="if(event.key==='Enter') addGalleryCustomCol()" />
+          <button class="btn btn-primary" style="padding:8px 13px;font-size:12px" onclick="addGalleryCustomCol()">Adicionar</button>
+        </div>
+        <div id="galCustomColsList"></div>
+      </div>
+    </div>
+    <div class="modal-foot" style="justify-content:flex-end">
+      <button class="btn btn-primary" onclick="closeGalleryColsModal()">Concluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- GALLERY: TAGS CATALOG MANAGER MODAL -->
+<div id="galTagsModal" class="modal-backdrop hidden" onclick="if(event.target===this) closeGalleryTagsModal()">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-head">
+      <h3>Gerenciar Tags</h3>
+      <button class="btn btn-sec" style="padding:4px 10px" onclick="closeGalleryTagsModal()">✕</button>
+    </div>
+    <div class="modal-body-pad" style="gap:12px">
+      <div class="row">
+        <input type="text" id="galCatalogNewTag" placeholder="Criar nova tag..." onkeydown="if(event.key==='Enter') addCatalogTag()" />
+        <button class="btn btn-primary" style="padding:8px 13px;font-size:12px" onclick="addCatalogTag()">Criar Tag</button>
+      </div>
+      <div id="galCatalogTagsList"></div>
+    </div>
+    <div class="modal-foot" style="justify-content:flex-end">
+      <button class="btn btn-primary" onclick="closeGalleryTagsModal()">Concluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- UNIFIED THEMED DIALOG MODAL (replaces alert / confirm / prompt) -->
+<div id="appDialogModal" class="modal-backdrop hidden" style="z-index:10050">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-head">
+      <div class="row" style="gap:10px;min-width:0">
+        <span id="dlgBadge" class="dlg-badge info">i</span>
+        <h3 id="dlgTitle" style="font-size:15px">Aviso</h3>
+      </div>
+      <button id="dlgCloseX" class="btn btn-sec" style="padding:4px 10px">✕</button>
+    </div>
+    <div class="modal-body-pad" style="gap:12px">
+      <div id="dlgMessage" class="dlg-msg"></div>
+      <ul id="dlgBullets" class="dlg-bullets hidden"></ul>
+      <input type="text" id="dlgInput" class="hidden" />
+    </div>
+    <div id="dlgFooter" class="modal-foot" style="justify-content:flex-end;flex-wrap:wrap"></div>
+  </div>
+</div>
+
+<script>
+let state = {
+  directDbReady: false,
+  plExport: [],
+  plImport: [],
+  rbSamples: [],
+  rbSamplerGlobalProps: {},
+  customSamples: [],
+  importSamples: [],
+  importHasSamplerPadEdits: false,
+  galleryItems: [],
+  gallerySelectedIds: new Set(),
+  galleryLoadedOnce: false,
+  galDetail: null,
+  exportTags: [],
+  importMetaFlags: { prefs: false, fx: false, midi: false, packTags: [] },
+  settings: { advancedMode: false, theme: 'studio-dark', activeProfile: '', profiles: [] },
+};
+let fsState = { mode: 'folder', ext: '', title: '', currentPath: '', parentPath: '', selectedFile: '', folders: [], files: [], shortcutsLoaded: false, reqId: 0, resolve: null };
+
+function log(msg) {
+  const box = document.getElementById('logBox');
+  if (!box) return;
+  box.textContent += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
+  box.scrollTop = box.scrollHeight;
+}
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+async function api(url, payload) {
+  const opts = payload !== undefined
+    ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }
+    : { method: 'GET' };
+  const r = await fetch(url, opts);
+  const data = await r.json();
+  if (!data.ok) throw new Error(data.error || 'Erro desconhecido');
+  return data;
+}
+
+
+/* ---- Unified Themed Dialogs (Zero native browser alert/confirm/prompt) ---- */
+let dlgResolver = null;
+
+function showAppDialog({ title = 'Aviso', message = '', bullets = [], tone = 'info', input = null, buttons = null }) {
+  return new Promise(resolve => {
+    dlgResolver = resolve;
+    const modal = document.getElementById('appDialogModal');
+    const badge = document.getElementById('dlgBadge');
+    const titleEl = document.getElementById('dlgTitle');
+    const msgEl = document.getElementById('dlgMessage');
+    const bulEl = document.getElementById('dlgBullets');
+    const inpEl = document.getElementById('dlgInput');
+    const footEl = document.getElementById('dlgFooter');
+    const closeX = document.getElementById('dlgCloseX');
+
+    const icons = { info: 'i', success: '✓', warning: '!', error: '✕' };
+    badge.className = 'dlg-badge ' + (icons[tone] ? tone : 'info');
+    badge.textContent = icons[tone] || 'i';
+    titleEl.textContent = title;
+    msgEl.textContent = message || '';
+    msgEl.classList.toggle('hidden', !message);
+
+    if (bullets && bullets.length) {
+      bulEl.innerHTML = '';
+      bullets.forEach(b => {
+        const li = document.createElement('li');
+        li.textContent = b;
+        bulEl.appendChild(li);
+      });
+      bulEl.classList.remove('hidden');
+    } else {
+      bulEl.classList.add('hidden');
+    }
+
+    if (input) {
+      inpEl.value = input.value || '';
+      inpEl.placeholder = input.placeholder || '';
+      inpEl.classList.remove('hidden');
+    } else {
+      inpEl.classList.add('hidden');
+    }
+
+    const finish = (action) => {
+      modal.classList.add('hidden');
+      const r = dlgResolver;
+      dlgResolver = null;
+      if (r) r({ action, value: input ? inpEl.value : null });
+    };
+
+    closeX.onclick = () => finish('cancel');
+    modal.onclick = (ev) => { if (ev.target === modal) finish('cancel'); };
+
+    const btns = buttons || [{ id: 'ok', label: 'OK', kind: 'primary' }];
+    footEl.innerHTML = '';
+    btns.forEach(b => {
+      const btn = document.createElement('button');
+      btn.className = 'btn ' + (b.kind === 'primary' ? 'btn-primary' : b.kind === 'danger' ? 'btn-danger' : 'btn-sec');
+      btn.textContent = b.label;
+      btn.onclick = async () => {
+        if (b.onClick) {
+          await b.onClick();
+          if (b.keepOpen) return;
+        }
+        finish(b.id);
+      };
+      footEl.appendChild(btn);
+    });
+
+    modal.classList.remove('hidden');
+    if (input) setTimeout(() => { inpEl.focus(); inpEl.select(); }, 30);
+  });
+}
+
+async function uiAlert(message, title = 'Aviso', tone = 'info') {
+  await showAppDialog({ title, message, tone, buttons: [{ id: 'ok', label: 'OK', kind: 'primary' }] });
+}
+
+async function uiError(message, title = 'Erro') {
+  await showAppDialog({ title, message, tone: 'error', buttons: [{ id: 'ok', label: 'Fechar', kind: 'primary' }] });
+}
+
+async function uiConfirm(message, title = 'Confirmar', okLabel = 'Confirmar', tone = 'warning') {
+  const r = await showAppDialog({
+    title,
+    message,
+    tone,
+    buttons: [
+      { id: 'cancel', label: 'Cancelar', kind: 'sec' },
+      { id: 'ok', label: okLabel, kind: 'primary' },
+    ],
+  });
+  return r.action === 'ok';
+}
+
+async function uiPrompt(message, defaultValue = '', title = 'Editar') {
+  const r = await showAppDialog({
+    title,
+    message,
+    tone: 'info',
+    input: { value: defaultValue, placeholder: 'Digite aqui...' },
+    buttons: [
+      { id: 'cancel', label: 'Cancelar', kind: 'sec' },
+      { id: 'ok', label: 'Salvar', kind: 'primary' },
+    ],
+  });
+  return r.action === 'ok' ? r.value : null;
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  ['export', 'import', 'gallery'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
+  });
+  if (name === 'gallery' && !state.galleryLoadedOnce) {
+    syncGallery(false);
+  }
+}
+
+/* ---- Settings Modal, Normal/Advanced Mode, Themes & Saved Profiles ---- */
+function syncAudioToggleCards() {
+  const mChk = document.getElementById('plIncludeAudio');
+  const mCard = document.getElementById('audioMusicCard');
+  const mPill = document.getElementById('audioMusicPill');
+  if (mChk && mCard && mPill) {
+    mCard.classList.toggle('off', !mChk.checked);
+    mPill.textContent = mChk.checked ? 'Com músicas' : 'Só XML';
+  }
+  const sChk = document.getElementById('plIncludeSamplesAudio');
+  const sCard = document.getElementById('audioSamplesCard');
+  const sPill = document.getElementById('audioSamplesPill');
+  if (sChk && sCard && sPill) {
+    sCard.classList.toggle('off', !sChk.checked);
+    sPill.textContent = sChk.checked ? 'Com áudios' : 'Só configs';
+  }
+}
+
+function applyModeUI(isAdv) {
+  state.settings.advancedMode = !!isAdv;
+  document.body.classList.toggle('advanced-mode', !!isAdv);
+  document.getElementById('modePill').classList.toggle('hidden', !isAdv);
+  document.getElementById('cfgAdvancedToggle').checked = !!isAdv;
+  document.getElementById('btnSettingsIcon').classList.toggle('active', !!isAdv);
+  if (!isAdv) {
+    updateExportSamplesPanel();
+  }
+}
+
+function applyThemeUI(themeName) {
+  const valid = ['studio-dark', 'midnight-violet', 'club-emerald', 'light-minimal'];
+  const t = valid.includes(themeName) ? themeName : 'studio-dark';
+  state.settings.theme = t;
+  document.documentElement.setAttribute('data-theme', t);
+  document.querySelectorAll('[data-theme-btn]').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-theme-btn') === t);
+  });
+}
+
+async function persistSettings() {
+  try {
+    const res = await api('/api/settings', state.settings);
+    state.settings = res.settings;
+  } catch (e) { log('ERRO ao salvar configurações: ' + e.message); }
+}
+
+async function onAdvancedToggleChange(checked) {
+  applyModeUI(checked);
+  await persistSettings();
+}
+
+function applyDisplayPrefsUI() {
+  const fs = Math.max(85, Math.min(130, Number(state.settings.fontScale) || 100));
+  const zm = Math.max(75, Math.min(130, Number(state.settings.appZoom) || 100));
+  const wd = state.settings.appWidth === 0 ? 0 : Math.max(760, Math.min(1600, Number(state.settings.appWidth) || 860));
+  state.settings.fontScale = fs;
+  state.settings.appZoom = zm;
+  state.settings.appWidth = wd;
+
+  document.documentElement.style.setProperty('--app-font-scale', (fs / 100).toFixed(2));
+  document.body.style.fontSize = (14 * fs / 100).toFixed(2) + 'px';
+  document.body.style.zoom = (zm / 100).toFixed(2);
+  document.documentElement.style.setProperty('--app-max-w', wd === 0 ? '100%' : (wd + 'px'));
+
+  const elFs = document.getElementById('cfgFontScale');
+  const elZm = document.getElementById('cfgAppZoom');
+  const elWd = document.getElementById('cfgAppWidth');
+  if (elFs) elFs.value = fs;
+  if (elZm) elZm.value = zm;
+  if (elWd) elWd.value = wd === 0 ? 1600 : wd;
+  const vFs = document.getElementById('cfgFontScaleVal');
+  const vZm = document.getElementById('cfgAppZoomVal');
+  const vWd = document.getElementById('cfgAppWidthVal');
+  if (vFs) vFs.textContent = fs + '%';
+  if (vZm) vZm.textContent = zm + '%';
+  if (vWd) vWd.textContent = wd === 0 ? '100% (Tela cheia)' : (wd + 'px');
+  document.querySelectorAll('[data-w-preset]').forEach(b => {
+    b.classList.toggle('active', Number(b.getAttribute('data-w-preset')) === wd);
+  });
+}
+
+let _dispSaveTimer = null;
+function onDisplayPrefChange() {
+  state.settings.fontScale = Number(document.getElementById('cfgFontScale').value) || 100;
+  state.settings.appZoom = Number(document.getElementById('cfgAppZoom').value) || 100;
+  state.settings.appWidth = Number(document.getElementById('cfgAppWidth').value) || 860;
+  applyDisplayPrefsUI();
+  clearTimeout(_dispSaveTimer);
+  _dispSaveTimer = setTimeout(() => persistSettings(), 220);
+}
+
+async function setAppWidthPreset(w) {
+  state.settings.appWidth = w;
+  applyDisplayPrefsUI();
+  await persistSettings();
+}
+
+async function resetDisplayPrefs() {
+  state.settings.fontScale = 100;
+  state.settings.appZoom = 100;
+  state.settings.appWidth = 860;
+  applyDisplayPrefsUI();
+  await persistSettings();
+}
+
+function showBusy(title, sub = 'Aguarde alguns instantes...') {
+  document.getElementById('busyTitle').textContent = title || 'Processando...';
+  document.getElementById('busySub').textContent = sub || '';
+  document.getElementById('busyOverlay').classList.remove('hidden');
+}
+function hideBusy() {
+  document.getElementById('busyOverlay').classList.add('hidden');
+}
+
+async function setTheme(themeName) {
+  applyThemeUI(themeName);
+  await persistSettings();
+}
+
+function openSettingsModal() {
+  renderProfilesList();
+  refreshDownloadedUpdatesList();
+  document.getElementById('settingsModal').classList.remove('hidden');
+}
+function closeSettingsModal() {
+  document.getElementById('settingsModal').classList.add('hidden');
+}
+
+function captureCurrentConfig() {
+  return {
+    advancedMode: !!state.settings.advancedMode,
+    theme: state.settings.theme,
+    fontScale: state.settings.fontScale || 100,
+    appZoom: state.settings.appZoom || 100,
+    appWidth: state.settings.appWidth ?? 860,
+    exportDest: document.getElementById('plExportDest').value,
+    importDest: document.getElementById('plImportDest').value,
+    includeAudio: document.getElementById('plIncludeAudio').checked,
+    includeCustomSamples: document.getElementById('plIncludeSamplesChk').checked,
+    customSamplesPath: document.getElementById('plSamplesPath').value,
+    applySamplerSettings: document.getElementById('plApplySamplerSettings').checked,
+    oldPrefix: document.getElementById('plOldPrefix').value,
+    newPrefix: document.getElementById('plNewPrefix').value,
+  };
+}
+
+async function saveCurrentProfile() {
+  const inp = document.getElementById('cfgProfileName');
+  const name = inp.value.trim();
+  if (!name) { inp.classList.add('input-error'); inp.focus(); return; }
+  inp.classList.remove('input-error');
+  const cfg = captureCurrentConfig();
+  const list = state.settings.profiles || [];
+  const existingIdx = list.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
+  if (existingIdx >= 0) {
+    list[existingIdx] = { name, config: cfg };
+  } else {
+    list.push({ name, config: cfg });
+  }
+  state.settings.profiles = list;
+  state.settings.activeProfile = name;
+  inp.value = '';
+  await persistSettings();
+  renderProfilesList();
+  log(`Perfil de configuração salvo: ${name}`);
+}
+
+async function applyProfile(idx) {
+  const prof = (state.settings.profiles || [])[idx];
+  if (!prof) return;
+  const c = prof.config || {};
+  applyThemeUI(c.theme || 'studio-dark');
+  if (c.fontScale !== undefined) state.settings.fontScale = c.fontScale;
+  if (c.appZoom !== undefined) state.settings.appZoom = c.appZoom;
+  if (c.appWidth !== undefined) state.settings.appWidth = c.appWidth;
+  applyDisplayPrefsUI();
+  applyModeUI(!!c.advancedMode);
+  if (c.exportDest) document.getElementById('plExportDest').value = c.exportDest;
+  if (c.importDest) document.getElementById('plImportDest').value = c.importDest;
+  if (c.advancedMode) {
+  document.getElementById('plIncludeAudio').checked = c.includeAudio !== false;
+  syncAudioToggleCards();
+    document.getElementById('plIncludeSamplesChk').checked = !!c.includeCustomSamples;
+    document.getElementById('plSamplesRow').classList.toggle('hidden', !c.includeCustomSamples);
+    document.getElementById('plSamplesPath').value = c.customSamplesPath || '';
+    document.getElementById('plOldPrefix').value = c.oldPrefix || '';
+    document.getElementById('plNewPrefix').value = c.newPrefix || '';
+  }
+  document.getElementById('plApplySamplerSettings').checked = c.applySamplerSettings !== false;
+  state.settings.activeProfile = prof.name;
+  await persistSettings();
+  renderProfilesList();
+  updateExportSamplesPanel();
+  log(`Perfil aplicado: ${prof.name}`);
+}
+
+async function editProfile(idx) {
+  const prof = (state.settings.profiles || [])[idx];
+  if (!prof) return;
+  const newName = await uiPrompt('Editar nome do perfil (as configurações atuais serão salvas nele):', prof.name, 'Editar Perfil');
+  if (newName === null) return;
+  const trimmed = newName.trim();
+  if (!trimmed) return;
+  state.settings.profiles[idx] = { name: trimmed, config: captureCurrentConfig() };
+  state.settings.activeProfile = trimmed;
+  await persistSettings();
+  renderProfilesList();
+  log(`Perfil atualizado: ${trimmed}`);
+}
+
+async function deleteProfile(idx) {
+  const prof = (state.settings.profiles || [])[idx];
+  if (!prof) return;
+  if (!(await uiConfirm(`Deseja remover o perfil "${prof.name}"?`, 'Remover Perfil', 'Remover', 'warning'))) return;
+  state.settings.profiles.splice(idx, 1);
+  if (state.settings.activeProfile === prof.name) state.settings.activeProfile = '';
+  await persistSettings();
+  renderProfilesList();
+}
+
+function renderProfilesList() {
+  const box = document.getElementById('cfgProfilesList');
+  const list = state.settings.profiles || [];
+  if (!list.length) {
+    box.innerHTML = '<div style="font-size:12px;color:var(--dim);padding:6px 2px">Nenhum perfil salvo ainda.</div>';
+    return;
+  }
+  box.innerHTML = '';
+  list.forEach((p, idx) => {
+    const row = document.createElement('div');
+    row.className = 'profile-row';
+    const isAct = state.settings.activeProfile === p.name;
+    const modeTag = p.config?.advancedMode ? 'Avançado' : 'Normal';
+    row.innerHTML = `<div style="min-width:0"><strong style="color:var(--text)">${escapeHtml(p.name)}</strong> ${isAct ? '<span class="badge" style="margin-left:5px">Ativo</span>' : ''}<div style="font-size:11px;color:var(--dim)">Modo ${modeTag} • Tema ${escapeHtml(p.config?.theme || 'studio-dark')}</div></div>
+      <div class="row" style="gap:6px">
+        <button class="btn btn-sec" style="padding:5px 9px;font-size:11.5px" onclick="applyProfile(${idx})">Usar</button>
+        <button class="btn btn-sec" style="padding:5px 9px;font-size:11.5px" onclick="editProfile(${idx})">Editar</button>
+        <button class="btn btn-danger" onclick="deleteProfile(${idx})">✕</button>
+      </div>`;
+    box.appendChild(row);
+  });
+}
+
+async function loadInitialSettings() {
+  try {
+    const r = await api('/api/settings');
+    state.settings = r.settings || state.settings;
+    applyThemeUI(state.settings.theme);
+    applyDisplayPrefsUI();
+    applyModeUI(state.settings.advancedMode);
+  } catch (e) {
+    applyThemeUI('studio-dark');
+    applyModeUI(false);
+  }
+}
+
+async function refreshStatus() {
+  try {
+    const r = await api('/api/status');
+    state.directDbReady = !!r.directDbReady;
+    if (r.version) document.getElementById('appVersionText').textContent = r.version;
+    const pill = document.getElementById('statusPill');
+    const txt = document.getElementById('statusText');
+    if (r.isRunning) { pill.classList.add('open'); txt.textContent = 'Rekordbox aberto'; }
+    else { pill.classList.remove('open'); txt.textContent = 'Rekordbox fechado'; }
+
+    document.getElementById('btnSetupDirectDb').classList.toggle('hidden', state.directDbReady);
+    if (!document.getElementById('plExportDest').value) document.getElementById('plExportDest').value = r.defaultExportDest;
+    if (!document.getElementById('plImportDest').value) document.getElementById('plImportDest').value = r.defaultImportDest;
+  } catch (e) { log('ERRO: ' + e.message); }
+}
+
+/* ---- Selective Samples (Export) ---- */
+function getActiveExportSamples() {
+  const list = [];
+  // Always load ONLY user's custom loaded samples (never Rekordbox factory samples)
+  const rbCustomOnly = state.rbSamples.filter(s => !s.isFactory);
+  list.push(...rbCustomOnly);
+  if (document.getElementById('plIncludeSamplesChk').checked) list.push(...state.customSamples);
+  return list;
+}
+
+function setProgressBar(prefix, pct) {
+  const p = Math.max(0, Math.min(100, Math.round(Number(pct) || 0)));
+  const wrap = document.getElementById(prefix + 'ProgressWrap');
+  const fill = document.getElementById(prefix + 'ProgressFill');
+  const lbl = document.getElementById(prefix + 'ProgressLabel');
+  if (!wrap || !fill || !lbl) return;
+  wrap.classList.remove('hidden');
+  fill.style.width = p + '%';
+  const hue = Math.round((p / 100) * 142); // 0 = red, 142 = emerald green
+  fill.style.backgroundColor = `hsl(${hue}, 78%, 45%)`;
+  lbl.textContent = p + '%';
+}
+
+function startProgressPolling(prefix, jobId) {
+  setProgressBar(prefix, 0);
+  const timer = setInterval(async () => {
+    try {
+      const r = await api('/api/progress?jobId=' + encodeURIComponent(jobId));
+      if (r.progress) setProgressBar(prefix, r.progress.pct);
+    } catch (_) {}
+  }, 160);
+  return () => clearInterval(timer);
+}
+
+function updateExportSamplesPanel() {
+  const active = getActiveExportSamples();
+  const wrap = document.getElementById('exportSamplesWrap');
+  wrap.classList.toggle('hidden', active.length === 0);
+  if (active.length > 0) renderExportSamplesList();
+}
+
+function renderExportSamplesList() {
+  const active = getActiveExportSamples();
+  const q = (document.getElementById('exportSamplesSearch').value || '').toLowerCase();
+  const box = document.getElementById('exportSamplesBox');
+  const frag = document.createDocumentFragment();
+  let selCount = 0;
+  active.forEach(item => {
+    if (item.checked) selCount++;
+    const hay = `${item.name} ${item.bank}`.toLowerCase();
+    if (q && !hay.includes(q)) return;
+    const row = document.createElement('label');
+    row.className = 'pl-row';
+    const editTag = item.editsLabel ? `<span class="tag-bank" style="color:var(--accent)">${escapeHtml(item.editsLabel)}</span>` : '';
+    row.innerHTML = `<span style="display:flex;align-items:center;gap:7px;min-width:0;flex-wrap:wrap"><input type="checkbox" ${item.checked ? 'checked' : ''} /><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(item.name)}</span><span class="tag-bank">${escapeHtml(item.bank)}</span>${editTag}</span><span class="pl-count">${escapeHtml(item.sizeLabel || '')}</span>`;
+    row.querySelector('input').onchange = ev => { item.checked = ev.target.checked; renderExportSamplesList(); };
+    frag.appendChild(row);
+  });
+  box.innerHTML = '';
+  box.appendChild(frag);
+  document.getElementById('exportSamplesSummary').textContent = `${selCount} de ${active.length} sample(s) selecionado(s) para exportação.`;
+}
+
+function toggleAllExportSamples(val) {
+  getActiveExportSamples().forEach(s => s.checked = val);
+  renderExportSamplesList();
+}
+
+async function detectRbSampler(verbose = false) {
+  const badge = document.getElementById('rbSamplerBadge');
+  badge.textContent = 'Verificando Sampler do Rekordbox...';
+  badge.className = 'badge empty';
+  try {
+    const res = await api('/api/sampler/detect', {});
+    const d = res.data;
+    state.rbSamples = (d.files || []).map(f => ({ ...f, checked: f.exists !== false }));
+    state.rbSamplerGlobalProps = d.samplerGlobalProps || {};
+    if (d.totalFiles > 0) {
+      badge.className = 'badge';
+      const padTxt = d.padsCount > 0 ? `${d.padsCount} pad(s) com edições` : `${d.totalFiles} arquivo(s)`;
+      badge.textContent = `${padTxt} detectado(s) no Sampler`;
+      if (verbose) log(`Sampler do Rekordbox: ${d.totalFiles} arquivo(s) encontrado(s).`);
+    } else {
+      badge.className = 'badge empty';
+      badge.textContent = d.dbAvailable ? 'Nenhum sample encontrado no Rekordbox' : 'Ative a leitura direta para ler o Sampler';
+    }
+    updateExportSamplesPanel();
+  } catch (e) {
+    badge.className = 'badge empty';
+    badge.textContent = 'Não foi possível ler o Sampler';
+  }
+}
+
+function toggleCustomSamplesRow() {
+  const on = document.getElementById('plIncludeSamplesChk').checked;
+  document.getElementById('plSamplesRow').classList.toggle('hidden', !on);
+  updateExportSamplesPanel();
+}
+
+async function pickCustomSamplesFolder() {
+  const chosen = await openExplorer({ title: 'Selecionar pasta extra de Samples', mode: 'folder', startPath: document.getElementById('plSamplesPath').value });
+  if (!chosen) return;
+  document.getElementById('plSamplesPath').value = chosen;
+  await scanCustomSamplesFolder();
+}
+
+async function scanCustomSamplesFolder() {
+  const fp = document.getElementById('plSamplesPath').value.trim();
+  if (!fp) return;
+  try {
+    const res = await api('/api/sampler/scan-folder', { folderPath: fp });
+    state.customSamples = (res.files || []).map(f => ({ ...f, checked: true }));
+    log(`Pasta extra de Samples: ${state.customSamples.length} arquivo(s) listado(s).`);
+    updateExportSamplesPanel();
+  } catch (e) { await uiError(e.message); }
+}
+
+/* ---- Selective Samples (Import) ---- */
+function renderImportSamplesList() {
+  const arr = state.importSamples;
+  const q = (document.getElementById('importSamplesSearch').value || '').toLowerCase();
+  const box = document.getElementById('importSamplesBox');
+  const frag = document.createDocumentFragment();
+  let selCount = 0;
+  arr.forEach(item => {
+    if (item.checked) selCount++;
+    const hay = `${item.name} ${item.group}`.toLowerCase();
+    if (q && !hay.includes(q)) return;
+    const row = document.createElement('label');
+    row.className = 'pl-row';
+    const grpTag = item.group ? `<span class="tag-bank">${escapeHtml(item.group)}</span>` : '';
+    const editTag = item.editsLabel ? `<span class="tag-bank" style="color:var(--accent)">${escapeHtml(item.editsLabel)}</span>` : '';
+    row.innerHTML = `<span style="display:flex;align-items:center;gap:7px;min-width:0;flex-wrap:wrap"><input type="checkbox" ${item.checked ? 'checked' : ''} /><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(item.name)}</span>${grpTag}${editTag}</span><span class="pl-count">${escapeHtml(item.sizeLabel || '')}</span>`;
+    row.querySelector('input').onchange = ev => { item.checked = ev.target.checked; renderImportSamplesList(); };
+    frag.appendChild(row);
+  });
+  box.innerHTML = '';
+  box.appendChild(frag);
+  document.getElementById('importSamplesSummary').textContent = `${selCount} de ${arr.length} sample(s) selecionado(s) para importação.`;
+}
+
+function toggleAllImportSamples(val) {
+  state.importSamples.forEach(s => s.checked = val);
+  renderImportSamplesList();
+}
+
+/* ---- Rekordbox Controls ---- */
+async function openRekordbox() {
+  try { log('Abrindo o Rekordbox...'); await api('/api/rb/open', {}); setTimeout(refreshStatus, 1800); }
+  catch (e) { await uiError(e.message); }
+}
+async function restartRekordbox() {
+  try { log('Reiniciando o Rekordbox...'); await api('/api/rb/restart', {}); setTimeout(refreshStatus, 2000); }
+  catch (e) { await uiError(e.message); }
+}
+async function closeRekordbox() {
+  try { log('Fechando o Rekordbox...'); await api('/api/rb/close', {}); setTimeout(refreshStatus, 900); }
+  catch (e) { await uiError(e.message); }
+}
+
+/* ---- Direct master.db Read-Only Export ---- */
+async function setupDirectDbReader() {
+  const btn = document.getElementById('btnSetupDirectDb');
+  btn.disabled = true; btn.textContent = 'Instalando módulo...';
+  try {
+    const res = await api('/api/db/setup', {});
+    (res.logs || []).forEach(l => log(l));
+    await refreshStatus();
+    await detectRbSampler(true);
+    await loadDirectFromRekordboxDb(false);
+  } catch (e) { await uiError('Erro ao instalar pyrekordbox:\n' + e.message); }
+  finally { btn.disabled = false; btn.textContent = 'Ativar leitura direta (1 clique)'; }
+}
+
+async function loadDirectFromRekordboxDb(silent = false) {
+  const banner = document.getElementById('autoLoadBanner');
+  const btn = document.getElementById('btnDirectReadDb');
+  if (btn) { btn.disabled = true; btn.textContent = 'Lendo playlists...'; }
+  banner.classList.remove('hidden');
+  banner.textContent = 'Lendo playlists do Rekordbox...';
+  const jobId = 'read_' + Date.now();
+  const stopPoll = startProgressPolling('read', jobId);
+  try {
+    const res = await api('/api/db/export-xml', { jobId });
+    setProgressBar('read', 100);
+    document.getElementById('plExportXmlPath').value = res.data.xmlPath;
+    state.plExport = res.data.playlists.map(p => ({ ...p, checked: false }));
+    document.getElementById('plExportListWrap').classList.remove('hidden');
+    renderPlList('export');
+    banner.classList.add('hidden');
+    log(`Pronto! ${state.plExport.length} playlists e ${res.data.totalTracks} faixas carregadas.`);
+  } catch (e) {
+    if (String(e.message).includes('PYREKORDBOX_MISSING')) {
+      banner.textContent = 'Módulo de leitura direta não encontrado. Ative o Modo Avançado nas Configurações ou reabra o iniciador.';
+      if (!silent && (await uiConfirm('Instalar o módulo pyrekordbox agora?', 'Instalar Dependência', 'Instalar', 'info'))) await setupDirectDbReader();
+    } else {
+      banner.textContent = 'Não foi possível ler o banco local do Rekordbox automaticamente: ' + e.message;
+      if (!silent) await uiError(e.message);
+    }
+  } finally {
+    stopPoll();
+    if (btn) { btn.disabled = false; btn.textContent = '⚡ Ler playlists direto do Rekordbox'; }
+  }
+}
+
+async function exportAutoXmlToFolder() {
+  const destDir = await openExplorer({ title: 'Onde salvar o XML completo?', mode: 'folder', startPath: document.getElementById('plExportDest').value });
+  if (!destDir) return;
+  try {
+    const res = await api('/api/db/export-xml', { destDir, fileName: 'rekordbox_exportado.xml' });
+    await uiAlert(`XML completo salvo em:\n${res.data.xmlPath}`, 'XML Salvo', 'success');
+  } catch (e) { await uiError(e.message); }
+}
+
+async function pickXmlForExport() {
+  const chosen = await openExplorer({ title: 'Selecione o arquivo rekordbox.xml', mode: 'file', ext: 'xml' });
+  if (!chosen) return;
+  document.getElementById('plExportXmlPath').value = chosen;
+  await loadXmlFromInput();
+}
+
+async function loadXmlFromInput() {
+  const xmlPath = document.getElementById('plExportXmlPath').value.trim();
+  if (!xmlPath) return await uiAlert('Selecione ou cole o caminho do arquivo .xml.', 'XML necessário', 'warning');
+  try {
+    const parsed = await api('/api/xml/parse', { xmlPath });
+    state.plExport = parsed.data.playlists.map(p => ({ ...p, checked: false }));
+    document.getElementById('plExportListWrap').classList.remove('hidden');
+    renderPlList('export');
+  } catch (e) { await uiError(e.message); }
+}
+
+async function pickPackForImport(ext) {
+  const curImpVal = (document.getElementById('plImportSource').value || '').trim();
+  const curImpDir = curImpVal ? curImpVal.replace(/[\\/][^\\/]+$/, '') : '';
+  const startImportDir = state.settings.lastImportBrowseDir || curImpDir || state.settings.galleryCreatedDir || '';
+  const chosen = await openExplorer({ title: `Selecione o pacote (.${ext})`, mode: 'file', ext, startPath: startImportDir });
+  if (chosen) {
+    const chosenDir = chosen.replace(/[\\/][^\\/]+$/, '');
+    if (chosenDir && chosenDir !== state.settings.lastImportBrowseDir) {
+      state.settings.lastImportBrowseDir = chosenDir;
+      persistSettings();
+    }
+  }
+  if (!chosen) return;
+  showBusy('Lendo pacote...', 'Carregando playlists, samples e configurações...');
+  try {
+    const insp = await api('/api/xml/inspect-import', { sourcePath: chosen });
+    hideBusy();
+    document.getElementById('plImportSource').value = chosen;
+    state.plImport = insp.data.playlists.map(p => ({ ...p, checked: true }));
+    state.importSamples = (insp.data.samples || []).map(s => ({ ...s, checked: true }));
+
+    document.getElementById('plImportListWrap').classList.remove('hidden');
+    const extrasTags = [];
+    if (insp.data.includesRbPrefs) extrasTags.push('Preferências');
+    if (insp.data.includesRbFx) extrasTags.push('Efeitos');
+    if (insp.data.includesRbMidi) extrasTags.push('MIDI');
+    const extrasInfo = extrasTags.length ? ` • RB: ${extrasTags.join(', ')}` : '';
+    const tagsInfo = (insp.data.packTags && insp.data.packTags.length) ? ` • Tags: ${insp.data.packTags.join(', ')}` : '';
+    const sampInfo = state.importSamples.length > 0 ? ` • ${state.importSamples.length} Sample(s)` : '';
+    document.getElementById('plImportMeta').textContent =
+      `Origem: ${insp.data.sourceOs.toUpperCase()} • ${insp.data.includesAudio ? 'Com músicas' : 'Somente XML'}${sampInfo}${extrasInfo}${tagsInfo}`;
+    state.importMetaFlags = {
+      prefs: !!insp.data.includesRbPrefs,
+      fx: !!insp.data.includesRbFx,
+      midi: !!insp.data.includesRbMidi,
+      packTags: insp.data.packTags || [],
+    };
+    const anyEx = state.importMetaFlags.prefs || state.importMetaFlags.fx || state.importMetaFlags.midi;
+    document.getElementById('importRbExtrasWrap').classList.toggle('hidden', !anyEx);
+    document.getElementById('impRbPrefsRow').classList.toggle('hidden', !state.importMetaFlags.prefs);
+    document.getElementById('impRbFxRow').classList.toggle('hidden', !state.importMetaFlags.fx);
+    document.getElementById('impRbMidiRow').classList.toggle('hidden', !state.importMetaFlags.midi);
+    document.getElementById('plApplyRbPrefs').checked = state.importMetaFlags.prefs;
+    document.getElementById('plApplyRbFx').checked = state.importMetaFlags.fx;
+    document.getElementById('plApplyRbMidi').checked = state.importMetaFlags.midi;
+    renderPlList('import');
+
+    const sampWrap = document.getElementById('importSamplesWrap');
+    sampWrap.classList.toggle('hidden', state.importSamples.length === 0);
+    state.importHasSamplerPadEdits = !!insp.data.hasSamplerPadEdits;
+    document.getElementById('applySamplerSettingsRow').classList.toggle('hidden', !state.importHasSamplerPadEdits);
+    document.getElementById('plImportSamplesConfigOnly').checked = !!insp.data.samplesConfigOnly;
+    if (state.importSamples.length > 0) renderImportSamplesList();
+  } catch (e) { hideBusy(); await uiError(e.message); }
+}
+
+function renderPlList(mode) {
+  const arr = mode === 'export' ? state.plExport : state.plImport;
+  const q = (document.getElementById(mode === 'export' ? 'plExportSearch' : 'plImportSearch').value || '').toLowerCase();
+  const box = document.getElementById(mode === 'export' ? 'plExportBox' : 'plImportBox');
+  const frag = document.createDocumentFragment();
+  let selCount = 0;
+  arr.forEach(pl => {
+    if (pl.checked) selCount++;
+    if (q && !pl.path.toLowerCase().includes(q)) return;
+    const row = document.createElement('label');
+    row.className = 'pl-row';
+    row.innerHTML = `<span style="display:flex;align-items:center;gap:9px"><input type="checkbox" ${pl.checked ? 'checked' : ''} /><span>${escapeHtml(pl.path)}</span></span><span class="pl-count">${pl.trackCount} faixas</span>`;
+    row.querySelector('input').onchange = ev => { pl.checked = ev.target.checked; renderPlList(mode); };
+    frag.appendChild(row);
+  });
+  box.innerHTML = '';
+  box.appendChild(frag);
+  if (mode === 'export') document.getElementById('plExportSummary').textContent = `${selCount} de ${arr.length} playlist(s) selecionada(s).`;
+}
+
+function toggleAllPl(mode, val) {
+  (mode === 'export' ? state.plExport : state.plImport).forEach(p => p.checked = val);
+  renderPlList(mode);
+}
+
+async function runExportPlaylists() {
+  const packInp = document.getElementById('plPackName');
+  const packName = packInp.value.trim();
+  if (!packName) {
+    packInp.classList.add('input-error');
+    packInp.focus();
+    return await uiAlert('Digite um nome para o pacote antes de exportar.', 'Nome obrigatório', 'warning');
+  }
+  const selected = state.plExport.filter(p => p.checked).map(p => p.path);
+  const selectedSamples = getActiveExportSamples()
+    .filter(s => s.checked)
+    .map(s => ({ path: s.path, bank: s.bank, source: s.source, slotAttribs: s.slotAttribs || null }));
+  const incPrefs = document.getElementById('plIncludeRbPrefs').checked;
+  const incFx = document.getElementById('plIncludeRbFx').checked;
+  const incMidi = document.getElementById('plIncludeRbMidi').checked;
+  if (!selected.length && !selectedSamples.length && !incPrefs && !incFx && !incMidi) {
+    return await uiAlert('Selecione ao menos uma playlist, sample ou configuração do Rekordbox para exportar.', 'Nada selecionado', 'warning');
+  }
+  if (state.exportTags.length === 0) {
+    const tagChoice = await showAppDialog({
+      title: 'Nenhuma tag atribuída',
+      tone: 'warning',
+      message: 'Você não adicionou nenhuma tag a este pacote. Deseja prosseguir mesmo assim?',
+      buttons: [
+        { id: 'proceed', label: 'Prosseguir mesmo assim', kind: 'primary' },
+        { id: 'cancel', label: 'Cancelar', kind: 'sec' },
+      ],
+    });
+    if (tagChoice.action !== 'proceed') return;
+  }
+
+  let finalIncPrefs = incPrefs;
+  let finalIncFx = incFx;
+  let finalIncMidi = incMidi;
+  let rbRunning = false;
+  try { rbRunning = !!(await api('/api/status')).isRunning; } catch (_) {}
+
+  const hasLiveFlushItems = finalIncFx || finalIncMidi || finalIncPrefs;
+  let restartAfterExport = false;
+  if (rbRunning && hasLiveFlushItems) {
+    const reasons = [];
+    if (finalIncFx) reasons.push('Efeitos configurados (FxUnitSettings.xml e PadFxSettings.xml só são salvos ao fechar o Rekordbox)');
+    if (finalIncMidi) reasons.push('Configurações de MIDI e mapeamentos (salvos no disco ao encerrar o Rekordbox)');
+    if (finalIncPrefs) reasons.push('Preferências recentes do Rekordbox (rekordbox3.settings)');
+
+    const skipLabel = finalIncFx && finalIncMidi
+      ? 'Seguir sem reiniciar (não exporta efeitos/MIDI)'
+      : finalIncFx
+        ? 'Seguir sem reiniciar (não exporta efeitos)'
+        : 'Seguir sem reiniciar (não exporta MIDI/prefs)';
+
+    const rbChoice = await showAppDialog({
+      title: 'Rekordbox aberto — atenção ao exportar',
+      tone: 'warning',
+      message: 'O Rekordbox precisa ser fechado para gravar no disco as alterações recentes de:',
+      bullets: reasons,
+      buttons: [
+        { id: 'restart_export', label: 'Reiniciar e Exportar', kind: 'primary' },
+        { id: 'skip_effects', label: skipLabel, kind: 'sec' },
+        { id: 'cancel', label: 'Cancelar', kind: 'sec' },
+      ],
+    });
+    if (rbChoice.action === 'cancel') return;
+    if (rbChoice.action === 'restart_export') {
+      restartAfterExport = true;
+    } else if (rbChoice.action === 'skip_effects') {
+      finalIncFx = false;
+      finalIncMidi = false;
+      if (!selected.length && !selectedSamples.length && !finalIncPrefs) {
+        return await uiAlert('Nenhuma playlist ou sample restante para exportar sem efeitos/MIDI.', 'Exportação cancelada', 'info');
+      }
+    }
+  }
+
+  const isAdv = state.settings.advancedMode;
+  const btn = document.getElementById('btnRunExport');
+  btn.disabled = true; btn.textContent = 'Exportando...';
+  const jobId = 'exp_' + Date.now();
+  const stopPoll = startProgressPolling('export', jobId);
+  try {
+    if (restartAfterExport) {
+      btn.textContent = 'Fechando Rekordbox com segurança...';
+      let closeRes = await api('/api/rb/close', { graceful: true, allowForce: false });
+      while (!closeRes.closed) {
+        const waitChoice = await showAppDialog({
+          title: 'Confirme o fechamento no Rekordbox',
+          tone: 'warning',
+          message: 'O Rekordbox ainda está aberto (pode estar exibindo um aviso de confirmação na tela). Feche o Rekordbox normalmente para que ele salve os Efeitos, MIDI e Preferências no disco e clique abaixo para continuar.',
+          buttons: [
+            { id: 'retry', label: 'Já fechei, continuar exportação', kind: 'primary' },
+            { id: 'cancel', label: 'Cancelar', kind: 'sec' },
+          ],
+        });
+        if (waitChoice.action !== 'retry') {
+          return;
+        }
+        const stNow = await api('/api/status');
+        closeRes = { closed: !stNow.isRunning };
+      }
+      await new Promise(r => setTimeout(r, 600));
+      btn.textContent = 'Exportando...';
+    }
+    const res = await api('/api/xml/export', {
+      jobId,
+      xmlPath: document.getElementById('plExportXmlPath').value,
+      selectedPaths: selected,
+      destDir: document.getElementById('plExportDest').value,
+      packName,
+      includeAudio: document.getElementById('plIncludeAudio').checked,
+      includeRekordboxSampler: true,
+      samplesConfigOnly: !document.getElementById('plIncludeSamplesAudio').checked,
+      zipCompression: 'stored',
+      samplesDir: (isAdv && document.getElementById('plIncludeSamplesChk').checked) ? document.getElementById('plSamplesPath').value : '',
+      selectedSampleItems: selectedSamples,
+      samplerGlobalProps: state.rbSamplerGlobalProps,
+      packTags: state.exportTags,
+      includeRbPrefs: finalIncPrefs,
+      includeRbFx: finalIncFx,
+      includeRbMidi: finalIncMidi,
+      makeZip: true,
+    });
+    setProgressBar('export', 100);
+    const d = res.result;
+    const sampTxt = d.totalSamplesCount > 0 ? ` | Samples: ${d.totalSamplesCount}` : '';
+    const cueTxt = ` | Cues/Loops: ${d.cueCount || 0}`;
+    const rbCfgList = [];
+    if (d.includesRbPrefs) rbCfgList.push('Preferências');
+    if (d.includesRbFx) rbCfgList.push('Efeitos');
+    if (d.includesRbMidi) rbCfgList.push('MIDI');
+    const rbCfgTxt = rbCfgList.length ? `\nConfigurações RB incluídas: ${rbCfgList.join(', ')}` : '';
+    if (d.outputPath && state.exportTags.length) await registerTagsForPackPath(d.outputPath, state.exportTags);
+    packInp.value = '';
+    state.exportTags = [];
+    renderExportTagsChips();
+    if (restartAfterExport) {
+      try { await api('/api/rb/open', {}); setTimeout(refreshStatus, 1800); } catch (_) {}
+    }
+    log(`Pacote criado em: ${d.outputPath}`);
+    await showAppDialog({
+      title: 'Pacote Exportado com Sucesso',
+      tone: 'success',
+      message: `Arquivo gerado em:\n${d.outputPath}\n\nPlaylists: ${d.playlistCount} | Faixas: ${d.trackCount} | Áudios: ${d.copiedAudioCount}${cueTxt}${sampTxt}${rbCfgTxt}`,
+      buttons: [
+        {
+          id: 'reveal',
+          label: 'Mostrar arquivo gerado na pasta',
+          kind: 'primary',
+          keepOpen: true,
+          onClick: async () => {
+            try { await api('/api/fs/reveal', { path: d.outputPath }); }
+            catch (err) { await uiError(err.message, 'Não foi possível abrir a pasta'); }
+          },
+        },
+        { id: 'close', label: 'Fechar', kind: 'sec' },
+      ],
+    });
+  } catch (e) { log('ERRO: ' + e.message); await uiError(e.message, 'Erro ao Exportar Pacote'); }
+  finally { stopPoll(); btn.disabled = false; btn.textContent = 'Exportar Pacote'; }
+}
+
+async function runImportPlaylists() {
+  const selected = state.plImport.filter(p => p.checked).map(p => p.path);
+  const selectedSamples = state.importSamples.filter(s => s.checked).map(s => s.relPath);
+  const apPrefs = state.importMetaFlags.prefs && document.getElementById('plApplyRbPrefs').checked;
+  const apFx = state.importMetaFlags.fx && document.getElementById('plApplyRbFx').checked;
+  const apMidi = state.importMetaFlags.midi && document.getElementById('plApplyRbMidi').checked;
+  if (!selected.length && !selectedSamples.length && !apPrefs && !apFx && !apMidi) {
+    return await uiAlert('Selecione ao menos uma playlist, sample ou configuração para importar.', 'Nada selecionado', 'warning');
+  }
+
+  const applyPads = state.importHasSamplerPadEdits && document.getElementById('plApplySamplerSettings').checked && selectedSamples.length > 0;
+  let rbRunning = false;
+  try { rbRunning = !!(await api('/api/status')).isRunning; } catch (_) {}
+
+  const restartReasons = [];
+  if (applyPads) restartReasons.push('Samples e edições dos pads do Sampler (SamplerSettings1.xml: bancos, slots, gain, loop e sync)');
+  if (apPrefs) restartReasons.push('Preferências do Rekordbox (rekordbox3.settings, browseSetting.xml, PlaySettings.xml)');
+  if (apFx) restartReasons.push('Efeitos configurados do Rekordbox (FX Units, Pad FX e Beat FX)');
+  if (apMidi) restartReasons.push('Configurações de MIDI e mapeamentos de controlador/teclado');
+  if (selected.length > 0 && rbRunning) restartReasons.push('Configuração do caminho da Biblioteca Importada XML nas preferências do Rekordbox');
+
+  let shouldRestart = false;
+  if (restartReasons.length > 0) {
+    const choice = await showAppDialog({
+      title: 'Reinicialização do Rekordbox necessária',
+      tone: 'warning',
+      message: 'O Rekordbox precisará ser reiniciado por conta de:',
+      bullets: restartReasons,
+      buttons: [
+        { id: 'restart', label: 'Importar e Reiniciar', kind: 'primary' },
+        { id: 'no_restart', label: 'Importar sem Reiniciar', kind: 'sec' },
+        { id: 'cancel', label: 'Cancelar', kind: 'sec' },
+      ],
+    });
+    if (choice.action === 'cancel') return;
+    shouldRestart = (choice.action === 'restart');
+  }
+
+  const btn = document.getElementById('btnRunImport');
+  btn.disabled = true; btn.textContent = shouldRestart ? 'Fechando Rekordbox e importando...' : 'Importando...';
+  showBusy(shouldRestart ? 'Fechando Rekordbox e importando...' : 'Importando pacote...', 'Extraindo músicas, samples e aplicando configurações. Pacotes grandes podem levar alguns instantes...');
+  try {
+    if (shouldRestart && rbRunning) {
+      log('Fechando o Rekordbox antes de gravar as configurações...');
+      await api('/api/rb/close', {});
+      await new Promise(r => setTimeout(r, 1100));
+    }
+
+    showBusy('Importando pacote...', 'Extraindo músicas, samples e atualizando o Rekordbox...');
+    const res = await api('/api/xml/import', {
+      sourcePath: document.getElementById('plImportSource').value,
+      selectedPaths: selected,
+      selectedSampleRelPaths: state.importSamples.length > 0 ? selectedSamples : null,
+      applySamplerSettings: document.getElementById('plApplySamplerSettings').checked,
+      samplesConfigOnly: document.getElementById('plImportSamplesConfigOnly').checked,
+      applyRbPrefs: apPrefs,
+      applyRbFx: apFx,
+      applyRbMidi: apMidi,
+      targetMusicDir: document.getElementById('plImportDest').value,
+      oldPrefix: state.settings.advancedMode ? document.getElementById('plOldPrefix').value : '',
+      newPrefix: state.settings.advancedMode ? document.getElementById('plNewPrefix').value : '',
+    });
+    const d = res.result;
+    if (d.packDestDir && d.importedPackTags && d.importedPackTags.length) {
+      await registerTagsForPackPath(d.packDestDir, d.importedPackTags);
+    }
+
+    if (shouldRestart) {
+      btn.textContent = 'Abrindo Rekordbox...';
+      try {
+        await api('/api/rb/open', {});
+        setTimeout(refreshStatus, 1800);
+      } catch (openErr) {
+        log('AVISO ao reabrir Rekordbox: ' + openErr.message);
+      }
+    }
+
+    const padAlert = d.appliedSamplerPadsCount > 0 ? `\n\n${d.appliedSamplerPadsCount} pad(s) com edições aplicados automaticamente no Sampler do Rekordbox.` : '';
+    const sampAlert = d.extractedSamples ? `\n\nSamples salvos em:\n${d.samplesOutputDir}${padAlert}` : '';
+    const xmlHint = d.xmlOutputPath ? `\n\nArquivo XML gerado:\n${d.xmlOutputPath}` : '';
+    const plAlert = d.playlistCount > 0
+      ? `${xmlHint}\n\nNo Rekordbox, clique em "rekordbox xml" → atualizar (↻) → importar lista/coleção.`
+      : '';
+    const restartNote = shouldRestart ? '\n\nO Rekordbox está sendo reiniciado com as novas configurações.' : '';
+    hideBusy();
+    await uiAlert(`Importação concluída!${sampAlert}${plAlert}${restartNote}`, 'Pacote Importado', 'success');
+  } catch (e) { hideBusy(); log('ERRO: ' + e.message); await uiError(e.message, 'Erro ao Importar Pacote'); }
+  finally { hideBusy(); btn.disabled = false; btn.textContent = 'Importar Selecionados'; }
+}
+
+/* ---- Fast Built-in Explorer ---- */
+function openExplorer({ title, mode = 'folder', ext = '', startPath = '' }) {
+  return new Promise(async resolve => {
+    const keepSc = fsState.shortcutsLoaded;
+    fsState = { mode, ext, title: title || '', currentPath: '', parentPath: '', selectedFile: '', folders: [], files: [], shortcutsLoaded: keepSc, reqId: (fsState.reqId || 0) + 1, resolve };
+    document.getElementById('fsModalTitle').textContent = title || (mode === 'file' ? 'Selecionar arquivo' : 'Selecionar pasta');
+    document.getElementById('fsConfirmBtn').textContent = mode === 'file' ? 'Abrir arquivo' : 'Usar esta pasta';
+    document.getElementById('fsModal').classList.remove('hidden');
+    await fsNavigate(startPath || '');
+  });
+}
+function closeFsModal() {
+  document.getElementById('fsModal').classList.add('hidden');
+  if (fsState.resolve) { const r = fsState.resolve; fsState.resolve = null; r(''); }
+}
+function confirmFsModal() {
+  const chosen = fsState.mode === 'file' ? fsState.selectedFile : fsState.currentPath;
+  if (!chosen) return;
+  document.getElementById('fsModal').classList.add('hidden');
+  if (fsState.resolve) { const r = fsState.resolve; fsState.resolve = null; r(chosen); }
+}
+async function useNativeOsPicker() {
+  try {
+    const r = await api(fsState.mode === 'file' ? '/api/pick-file' : '/api/pick-folder', { title: fsState.title || 'Selecionar', ext: fsState.ext || '', initialDir: fsState.currentPath || '' });
+    if (r.path) {
+      document.getElementById('fsModal').classList.add('hidden');
+      if (fsState.resolve) { const res = fsState.resolve; fsState.resolve = null; res(r.path); }
+    }
+  } catch (e) { log('ERRO: ' + e.message); }
+}
+async function fsNavigate(targetPath) {
+  const myReq = ++fsState.reqId;
+  const list = document.getElementById('fsList');
+  list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--dim);font-size:12.5px">Carregando...</div>';
+  try {
+    const res = await api('/api/fs/list', { path: targetPath, mode: fsState.mode, ext: fsState.ext, includeShortcuts: !fsState.shortcutsLoaded });
+    if (myReq !== fsState.reqId) return;
+    const d = res.data;
+    fsState.currentPath = d.currentPath; fsState.parentPath = d.parentPath; fsState.selectedFile = '';
+    document.getElementById('fsPathBar').value = d.currentPath;
+    document.getElementById('fsUpBtn').disabled = !d.parentPath;
+    if (d.shortcuts && !fsState.shortcutsLoaded) {
+      fsState.shortcutsLoaded = true;
+      const sc = document.getElementById('fsShortcuts'); sc.innerHTML = '';
+      d.shortcuts.forEach(s => {
+        const b = document.createElement('button'); b.className = 'fs-shortcut'; b.textContent = s.label; b.title = s.path;
+        b.onclick = () => fsNavigate(s.path); sc.appendChild(b);
+      });
+    }
+    fsState.folders = d.folders || []; fsState.files = d.files || [];
+    document.getElementById('fsFilterInput').value = '';
+    renderFsItems(); list.scrollTop = 0; updateFsSelectionLabel();
+  } catch (e) { if (myReq === fsState.reqId) log('ERRO no explorador: ' + e.message); }
+}
+function renderFsItems() {
+  const list = document.getElementById('fsList');
+  const q = (document.getElementById('fsFilterInput').value || '').toLowerCase();
+  const files = (fsState.mode === 'file' ? fsState.files : []).filter(f => !q || f.name.toLowerCase().includes(q));
+  const folders = fsState.folders.filter(f => !q || f.name.toLowerCase().includes(q));
+  document.getElementById('fsCountBadge').textContent = fsState.mode === 'file' ? `${files.length} arquivo(s) • ${folders.length} pasta(s)` : `${folders.length} pasta(s)`;
+
+  const frag = document.createDocumentFragment();
+  files.slice(0, 350).forEach(f => {
+    const row = document.createElement('div');
+    row.className = 'fs-item' + (fsState.selectedFile === f.path ? ' selected' : '');
+    row.innerHTML = `<span style="color:var(--accent);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📄 ${escapeHtml(f.name)}</span><span style="font-size:11px;color:var(--muted);flex-shrink:0">${escapeHtml(f.sizeLabel)}</span>`;
+    row.onclick = () => {
+      list.querySelectorAll('.fs-item.selected').forEach(el => el.classList.remove('selected'));
+      row.classList.add('selected'); fsState.selectedFile = f.path; updateFsSelectionLabel();
+    };
+    row.ondblclick = () => { fsState.selectedFile = f.path; confirmFsModal(); };
+    frag.appendChild(row);
+  });
+  folders.slice(0, 350).forEach(f => {
+    const row = document.createElement('div'); row.className = 'fs-item';
+    row.innerHTML = `<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📁 ${escapeHtml(f.name)}</span><span style="font-size:11px;color:var(--dim);flex-shrink:0">Pasta</span>`;
+    row.onclick = () => fsNavigate(f.path);
+    frag.appendChild(row);
+  });
+  list.innerHTML = '';
+  if (!files.length && !folders.length) list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--dim);font-size:12.5px">Nenhum item encontrado.</div>';
+  else list.appendChild(frag);
+}
+function fsGoUp() { if (fsState.parentPath) fsNavigate(fsState.parentPath); }
+function updateFsSelectionLabel() {
+  const chosen = fsState.mode === 'file' ? fsState.selectedFile : fsState.currentPath;
+  document.getElementById('fsSelectionLabel').textContent = chosen || 'Escolha um item';
+  document.getElementById('fsConfirmBtn').disabled = !chosen;
+}
+async function pickFolderInto(inputId) {
+  const chosen = await openExplorer({ title: 'Selecionar pasta', mode: 'folder', startPath: document.getElementById(inputId).value });
+  if (chosen) document.getElementById(inputId).value = chosen;
+}
+
+
+/* ---- Galeria (Lista de Pacotes, Colunas, Tags, Filtros & Importação Seletiva) ---- */
+const GAL_STD_COLS = [
+  { key: 'name', label: 'Pacote' },
+  { key: 'origin', label: 'Origem' },
+  { key: 'date', label: 'Data' },
+  { key: 'playlists', label: 'Playlists' },
+  { key: 'samples', label: 'Samples' },
+  { key: 'size', label: 'Tamanho' },
+  { key: 'tags', label: 'Tags' },
+];
+
+
+/* ---- Export Tags & Rekordbox Config Extras (Prefs, FX, MIDI) ---- */
+function renderExportTagsChips() {
+  const wrap = document.getElementById('expTagsChipsWrap');
+  const badge = document.getElementById('expTagsCountBadge');
+  if (!wrap) return;
+  const catalog = state.settings.galleryTagsCatalog || [];
+  const union = Array.from(new Set([...catalog, ...state.exportTags]));
+  wrap.innerHTML = '';
+  union.forEach(t => {
+    const active = state.exportTags.includes(t);
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'tag-chip ' + (active ? 'active' : 'inactive');
+    chip.textContent = (active ? '✓ ' : '+ ') + t;
+    chip.onclick = () => {
+      if (state.exportTags.includes(t)) state.exportTags = state.exportTags.filter(x => x !== t);
+      else state.exportTags.push(t);
+      renderExportTagsChips();
+    };
+    wrap.appendChild(chip);
+  });
+  badge.textContent = `${state.exportTags.length} selecionada(s)`;
+  badge.className = state.exportTags.length > 0 ? 'badge' : 'badge empty';
+}
+
+async function addExportTag() {
+  const inp = document.getElementById('expNewTagInput');
+  const t = inp.value.trim();
+  if (!t) return;
+  const catalog = state.settings.galleryTagsCatalog || [];
+  if (!catalog.includes(t)) catalog.push(t);
+  state.settings.galleryTagsCatalog = catalog;
+  if (!state.exportTags.includes(t)) state.exportTags.push(t);
+  inp.value = '';
+  await persistSettings();
+  populateGalleryTagFilter();
+  renderExportTagsChips();
+}
+
+async function detectRbConfigExtras() {
+  try {
+    const res = await api('/api/rb/extras-detect', {});
+    const d = res.data;
+    document.getElementById('rbPrefsCountLbl').textContent = d.prefsCount ? `(${d.prefsCount} arq.)` : '(não detectado)';
+    document.getElementById('rbFxCountLbl').textContent = d.fxCount ? `(${d.fxCount} arq.)` : '(não detectado)';
+    document.getElementById('rbMidiCountLbl').textContent = d.midiCount ? `(${d.midiCount} arq.)` : '(não detectado)';
+    const tot = (d.prefsCount || 0) + (d.fxCount || 0) + (d.midiCount || 0);
+    const badge = document.getElementById('rbExtrasBadge');
+    badge.className = tot > 0 ? 'badge' : 'badge empty';
+    badge.textContent = tot > 0 ? `${tot} arquivo(s) encontrado(s)` : 'Nenhuma config detectada';
+  } catch (_) {}
+}
+
+async function registerTagsForPackPath(packPath, tags) {
+  if (!packPath || !Array.isArray(tags) || !tags.length) return;
+  const catalog = state.settings.galleryTagsCatalog || [];
+  tags.forEach(t => { if (!catalog.includes(t)) catalog.push(t); });
+  state.settings.galleryTagsCatalog = catalog;
+  const key = packPath.toLowerCase();
+  const meta = getPackMeta(key);
+  tags.forEach(t => { if (!meta.tags.includes(t)) meta.tags.push(t); });
+  await persistSettings();
+  populateGalleryTagFilter();
+  renderExportTagsChips();
+}
+
+function initGalleryInputs() {
+  const s = state.settings;
+  if (s.galleryCreatedDir) document.getElementById('galCreatedDir').value = s.galleryCreatedDir;
+  if (s.galleryImportedDir) document.getElementById('galImportedDir').value = s.galleryImportedDir;
+  populateGalleryTagFilter();
+}
+
+async function pickGalleryFolder(inputId) {
+  const chosen = await openExplorer({ title: 'Selecionar pasta de pacotes', mode: 'folder', startPath: document.getElementById(inputId).value });
+  if (!chosen) return;
+  document.getElementById(inputId).value = chosen;
+  state.settings.galleryCreatedDir = document.getElementById('galCreatedDir').value.trim();
+  state.settings.galleryImportedDir = document.getElementById('galImportedDir').value.trim();
+  await persistSettings();
+  await syncGallery(false);
+}
+
+async function syncGallery(savePaths = true) {
+  const cdir = document.getElementById('galCreatedDir').value.trim();
+  const idir = document.getElementById('galImportedDir').value.trim();
+  if (savePaths) {
+    state.settings.galleryCreatedDir = cdir;
+    state.settings.galleryImportedDir = idir;
+    await persistSettings();
+  }
+  const body = document.getElementById('galTableBody');
+  body.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--dim);padding:22px">Sincronizando pacotes...</td></tr>';
+  try {
+    const res = await api('/api/gallery/scan', { createdDir: cdir, importedDir: idir });
+    state.galleryItems = res.data.items || [];
+    let tagsUpdated = false;
+    state.galleryItems.forEach(it => {
+      if (it.packTags && it.packTags.length) {
+        const m = getPackMeta(it.id);
+        const cat = state.settings.galleryTagsCatalog || [];
+        it.packTags.forEach(t => {
+          if (!cat.includes(t)) { cat.push(t); tagsUpdated = true; }
+          if (!m.tags.includes(t)) { m.tags.push(t); tagsUpdated = true; }
+        });
+        state.settings.galleryTagsCatalog = cat;
+      }
+    });
+    if (tagsUpdated) await persistSettings();
+    state.galleryLoadedOnce = true;
+    populateGalleryTagFilter();
+    renderGalleryTable();
+  } catch (e) {
+    body.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--red);padding:22px">Erro ao sincronizar galeria.</td></tr>';
+    await uiError(e.message, 'Erro na Galeria');
+  }
+}
+
+function getPackMeta(packId) {
+  const all = state.settings.galleryMeta || {};
+  if (!all[packId]) all[packId] = { tags: [], custom: {} };
+  if (!Array.isArray(all[packId].tags)) all[packId].tags = [];
+  if (!all[packId].custom) all[packId].custom = {};
+  state.settings.galleryMeta = all;
+  return all[packId];
+}
+
+function populateGalleryTagFilter() {
+  const sel = document.getElementById('galFilterTag');
+  if (!sel) return;
+  const cur = sel.value || 'all';
+  const tags = state.settings.galleryTagsCatalog || [];
+  sel.innerHTML = '<option value="all">Tag: Todas</option>';
+  tags.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t;
+    opt.textContent = 'Tag: ' + t;
+    sel.appendChild(opt);
+  });
+  sel.value = tags.includes(cur) ? cur : 'all';
+}
+
+function renderGalleryTable() {
+  const visCols = state.settings.galleryVisibleCols || GAL_STD_COLS.map(c => c.key);
+  const customCols = state.settings.galleryCustomCols || [];
+  const activeCols = [
+    ...GAL_STD_COLS.filter(c => visCols.includes(c.key)),
+    ...customCols.map(c => ({ key: 'custom:' + c.key, label: c.label, customKey: c.key })),
+  ];
+
+  const thead = document.getElementById('galTableHead');
+  thead.innerHTML = '<tr><th style="width:34px;text-align:center"><input type="checkbox" id="galSelectAllChk" style="cursor:pointer;accent-color:var(--accent)" title="Selecionar todos visíveis" onchange="toggleSelectAllGallery(this.checked)" /></th>' + activeCols.map(c => `<th>${escapeHtml(c.label)}</th>`).join('') + '<th style="text-align:right">Ações</th></tr>';
+
+  const q = (document.getElementById('galSearch').value || '').toLowerCase();
+  const fOrigin = document.getElementById('galFilterOrigin').value;
+  const fContent = document.getElementById('galFilterContent').value;
+  const fTag = document.getElementById('galFilterTag').value;
+
+  const filtered = state.galleryItems.filter(item => {
+    const meta = getPackMeta(item.id);
+    if (fOrigin !== 'all' && item.origin !== fOrigin) return false;
+    if (fContent === 'samples' && !(item.samplesCount > 0)) return false;
+    if (fContent === 'pads' && !item.hasSamplerPadEdits) return false;
+    if (fContent === 'prefs' && !item.includesRbPrefs) return false;
+    if (fContent === 'fx' && !item.includesRbFx) return false;
+    if (fContent === 'midi' && !item.includesRbMidi) return false;
+    if (fTag !== 'all' && !meta.tags.includes(fTag)) return false;
+    if (q) {
+      const customVals = Object.values(meta.custom || {}).join(' ');
+      const hay = `${item.name} ${item.fileName} ${item.origin} ${(item.playlistNames || []).join(' ')} ${meta.tags.join(' ')} ${customVals}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const tbody = document.getElementById('galTableBody');
+  state._lastGalleryFilteredIds = filtered.map(it => it.id);
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="${Math.max(1, activeCols.length + 2)}" style="text-align:center;color:var(--dim);padding:24px">Nenhum pacote encontrado com os filtros atuais.</td></tr>`;
+    document.getElementById('galSummary').textContent = `0 de ${state.galleryItems.length} pacote(s) exibido(s).`;
+    updateGalleryBulkBar();
+    return;
+  }
+
+  const frag = document.createDocumentFragment();
+  filtered.forEach(item => {
+    const meta = getPackMeta(item.id);
+    const tr = document.createElement('tr');
+    tr.onclick = () => openGalleryDetail(item);
+    const tdChk = document.createElement('td');
+    tdChk.style.textAlign = 'center';
+    tdChk.style.width = '34px';
+    tdChk.onclick = ev => ev.stopPropagation();
+    const chk = document.createElement('input');
+    chk.type = 'checkbox';
+    chk.style.cursor = 'pointer';
+    chk.style.accentColor = 'var(--accent)';
+    chk.checked = state.gallerySelectedIds.has(item.id);
+    chk.onchange = () => {
+      if (chk.checked) state.gallerySelectedIds.add(item.id);
+      else state.gallerySelectedIds.delete(item.id);
+      updateGalleryBulkBar();
+    };
+    tdChk.appendChild(chk);
+    tr.appendChild(tdChk);
+    activeCols.forEach(col => {
+      const td = document.createElement('td');
+      if (col.key === 'name') {
+        const cfgBadges = [
+          item.includesRbPrefs ? '<span class="badge" style="margin-left:4px">Prefs</span>' : '',
+          item.includesRbFx ? '<span class="badge" style="margin-left:4px">FX</span>' : '',
+          item.includesRbMidi ? '<span class="badge" style="margin-left:4px">MIDI</span>' : '',
+        ].join('');
+        td.innerHTML = `<strong style="color:var(--text)">${escapeHtml(item.name)}</strong>${cfgBadges}<div style="font-size:11px;color:var(--dim)">${escapeHtml(item.fileName)}</div>`;
+      } else if (col.key === 'origin') {
+        const cls = item.origin === 'Criado' ? 'criado' : 'importado';
+        td.innerHTML = `<span class="pill-origin ${cls}">${escapeHtml(item.origin)}</span>`;
+      } else if (col.key === 'date') {
+        td.textContent = item.date || '-';
+      } else if (col.key === 'playlists') {
+        td.textContent = `${item.playlistCount} (${item.trackCount} faixas)`;
+      } else if (col.key === 'samples') {
+        td.innerHTML = item.samplesCount > 0
+          ? `${item.samplesCount}${item.hasSamplerPadEdits ? ' <span class="badge" style="margin-left:4px">Pads</span>' : ''}`
+          : '<span style="color:var(--dim)">0</span>';
+      } else if (col.key === 'size') {
+        td.textContent = item.sizeLabel || '-';
+      } else if (col.key === 'tags') {
+        td.innerHTML = meta.tags.length
+          ? meta.tags.map(t => `<span class="tag-chip active">${escapeHtml(t)}</span>`).join('')
+          : '<span style="color:var(--dim);font-size:11.5px">—</span>';
+      } else if (col.customKey) {
+        td.textContent = (meta.custom && meta.custom[col.customKey]) ? meta.custom[col.customKey] : '—';
+      }
+      tr.appendChild(td);
+    });
+    const tdAct = document.createElement('td');
+    tdAct.style.textAlign = 'right';
+    tdAct.style.whiteSpace = 'nowrap';
+    tdAct.onclick = ev => ev.stopPropagation();
+    tdAct.innerHTML = `<button class="btn btn-sec" style="padding:4px 7px;font-size:11px;margin-right:4px" title="Renomear pacote no PC">✏️</button><button class="btn btn-sec" style="padding:4px 7px;font-size:11px;margin-right:4px" title="Duplicar pacote no PC">⧉</button><button class="btn btn-danger" style="padding:4px 7px;font-size:11px" title="Excluir pacote do PC">🗑️</button>`;
+    const btns = tdAct.querySelectorAll('button');
+    btns[0].onclick = () => renameGalleryPack(item);
+    btns[1].onclick = () => duplicateGalleryPack(item);
+    btns[2].onclick = () => deleteGalleryPack(item);
+    tr.appendChild(tdAct);
+    frag.appendChild(tr);
+  });
+  tbody.innerHTML = '';
+  tbody.appendChild(frag);
+  document.getElementById('galSummary').textContent = `${filtered.length} de ${state.galleryItems.length} pacote(s) exibido(s). Clique em um pacote para ver detalhes ou importar seletivamente.`;
+  updateGalleryBulkBar();
+}
+
+function updateGalleryBulkBar() {
+  const validIds = new Set(state.galleryItems.map(it => it.id));
+  for (const id of Array.from(state.gallerySelectedIds)) {
+    if (!validIds.has(id)) state.gallerySelectedIds.delete(id);
+  }
+  const cnt = state.gallerySelectedIds.size;
+  const bar = document.getElementById('galBulkBar');
+  const lbl = document.getElementById('galBulkCount');
+  if (bar && lbl) {
+    bar.classList.toggle('hidden', cnt === 0);
+    lbl.textContent = `${cnt} pacote(s) selecionado(s)`;
+  }
+  const allChk = document.getElementById('galSelectAllChk');
+  const visIds = state._lastGalleryFilteredIds || [];
+  if (allChk) {
+    allChk.checked = visIds.length > 0 && visIds.every(id => state.gallerySelectedIds.has(id));
+    allChk.indeterminate = cnt > 0 && !allChk.checked && visIds.some(id => state.gallerySelectedIds.has(id));
+  }
+}
+
+function toggleSelectAllGallery(checked) {
+  const visIds = state._lastGalleryFilteredIds || [];
+  visIds.forEach(id => {
+    if (checked) state.gallerySelectedIds.add(id);
+    else state.gallerySelectedIds.delete(id);
+  });
+  renderGalleryTable();
+}
+
+function clearGallerySelection() {
+  state.gallerySelectedIds.clear();
+  renderGalleryTable();
+}
+
+async function bulkDuplicateGalleryPacks() {
+  const items = state.galleryItems.filter(it => state.gallerySelectedIds.has(it.id));
+  if (!items.length) return;
+  const names = items.slice(0, 6).map(it => '• ' + it.name).join('\n') + (items.length > 6 ? `\n... e mais ${items.length - 6}` : '');
+  const ok = await uiConfirm(`Deseja duplicar ${items.length} pacote(s) selecionado(s) no seu PC?\n\n${names}`, 'Duplicar Pacotes em Lote', 'Duplicar todos', 'info');
+  if (!ok) return;
+  showBusy('Duplicando pacotes...', `Copiando ${items.length} pacote(s) selecionado(s)...`);
+  let done = 0;
+  const errs = [];
+  for (const item of items) {
+    try {
+      await api('/api/gallery/duplicate', { path: item.path, origin: item.origin });
+      done++;
+    } catch (e) {
+      errs.push(`${item.name}: ${e.message}`);
+    }
+  }
+  hideBusy();
+  state.gallerySelectedIds.clear();
+  await syncGallery(false);
+  if (errs.length) {
+    await uiAlert(`${done} pacote(s) duplicado(s), mas houve erro em ${errs.length}:\n${errs.join('\n')}`, 'Duplicação Concluída com Avisos', 'warning');
+  } else {
+    await uiAlert(`${done} pacote(s) duplicado(s) com sucesso!`, 'Pacotes Duplicados', 'success');
+  }
+}
+
+async function bulkDeleteGalleryPacks() {
+  const items = state.galleryItems.filter(it => state.gallerySelectedIds.has(it.id));
+  if (!items.length) return;
+  const names = items.slice(0, 6).map(it => '• ' + it.name).join('\n') + (items.length > 6 ? `\n... e mais ${items.length - 6}` : '');
+  const ok = await uiConfirm(`ATENÇÃO: Isso vai apagar permanentemente ${items.length} pacote(s) do seu computador:\n\n${names}\n\nEssa ação não pode ser desfeita.`, 'Excluir Pacotes em Lote', 'Excluir permanentemente', 'danger');
+  if (!ok) return;
+  showBusy('Excluindo pacotes...', `Removendo ${items.length} pacote(s) do disco...`);
+  let done = 0;
+  const errs = [];
+  const meta = state.settings.galleryMeta || {};
+  for (const item of items) {
+    try {
+      await api('/api/gallery/delete', { path: item.path, origin: item.origin });
+      delete meta[item.id];
+      done++;
+    } catch (e) {
+      errs.push(`${item.name}: ${e.message}`);
+    }
+  }
+  state.settings.galleryMeta = meta;
+  await persistSettings();
+  hideBusy();
+  state.gallerySelectedIds.clear();
+  await syncGallery(false);
+  if (errs.length) {
+    await uiAlert(`${done} pacote(s) excluído(s), mas houve erro em ${errs.length}:\n${errs.join('\n')}`, 'Exclusão Concluída com Avisos', 'warning');
+  } else {
+    await uiAlert(`${done} pacote(s) excluído(s) do computador.`, 'Pacotes Excluídos', 'success');
+  }
+}
+
+/* ---- Package Detail Modal & Selective Import from Gallery ---- */
+async function openGalleryDetail(item) {
+  showBusy('Abrindo pacote...', 'Lendo playlists, samples e configurações...');
+  try {
+    const insp = await api('/api/xml/inspect-import', { sourcePath: item.path });
+    hideBusy();
+    state.galDetail = {
+      item,
+      sourcePath: item.path,
+      hasSamplerPadEdits: !!insp.data.hasSamplerPadEdits,
+      includesRbPrefs: !!insp.data.includesRbPrefs,
+      includesRbFx: !!insp.data.includesRbFx,
+      includesRbMidi: !!insp.data.includesRbMidi,
+      playlists: (insp.data.playlists || []).map(p => ({ ...p, checked: true })),
+      samples: (insp.data.samples || []).map(s => ({ ...s, checked: true })),
+    };
+    document.getElementById('galDetTitle').textContent = item.name;
+    document.getElementById('galDetSub').textContent = `${item.origin} • ${item.date} • ${item.sizeLabel} • ${item.path}`;
+    renderGalDetailTags();
+    renderGalDetailCustomCols();
+    renderGalDetailLists();
+    document.getElementById('galDetSampWrap').classList.toggle('hidden', state.galDetail.samples.length === 0);
+    document.getElementById('galDetApplyPadsRow').classList.toggle('hidden', !state.galDetail.hasSamplerPadEdits);
+    document.getElementById('galDetApplyPads').checked = true;
+    document.getElementById('galDetSamplesConfigOnly').checked = !!insp.data.samplesConfigOnly;
+    const anyGEx = state.galDetail.includesRbPrefs || state.galDetail.includesRbFx || state.galDetail.includesRbMidi;
+    document.getElementById('galDetRbExtrasWrap').classList.toggle('hidden', !anyGEx);
+    document.getElementById('galDetPrefsRow').classList.toggle('hidden', !state.galDetail.includesRbPrefs);
+    document.getElementById('galDetFxRow').classList.toggle('hidden', !state.galDetail.includesRbFx);
+    document.getElementById('galDetMidiRow').classList.toggle('hidden', !state.galDetail.includesRbMidi);
+    document.getElementById('galDetApplyPrefs').checked = state.galDetail.includesRbPrefs;
+    document.getElementById('galDetApplyFx').checked = state.galDetail.includesRbFx;
+    document.getElementById('galDetApplyMidi').checked = state.galDetail.includesRbMidi;
+    document.getElementById('galDetailModal').classList.remove('hidden');
+  } catch (e) {
+    await uiError(e.message, 'Não foi possível ler o pacote');
+  }
+}
+
+function closeGalleryDetail() {
+  document.getElementById('galDetailModal').classList.add('hidden');
+  state.galDetail = null;
+}
+
+function renderGalDetailTags() {
+  if (!state.galDetail) return;
+  const meta = getPackMeta(state.galDetail.item.id);
+  const catalog = state.settings.galleryTagsCatalog || [];
+  const wrap = document.getElementById('galDetTagsWrap');
+  wrap.innerHTML = '';
+  const unionTags = Array.from(new Set([...catalog, ...meta.tags]));
+  if (!unionTags.length) {
+    wrap.innerHTML = '<span style="font-size:12px;color:var(--dim)">Nenhuma tag cadastrada ainda.</span>';
+    return;
+  }
+  unionTags.forEach(t => {
+    const active = meta.tags.includes(t);
+    const chip = document.createElement('button');
+    chip.className = 'tag-chip ' + (active ? 'active' : 'inactive');
+    chip.textContent = (active ? '✓ ' : '+ ') + t;
+    chip.onclick = async () => {
+      if (meta.tags.includes(t)) meta.tags = meta.tags.filter(x => x !== t);
+      else meta.tags.push(t);
+      await persistSettings();
+      renderGalDetailTags();
+      renderGalleryTable();
+    };
+    wrap.appendChild(chip);
+  });
+}
+
+async function addQuickTagToDetail() {
+  if (!state.galDetail) return;
+  const inp = document.getElementById('galDetNewTag');
+  const t = inp.value.trim();
+  if (!t) return;
+  const catalog = state.settings.galleryTagsCatalog || [];
+  if (!catalog.includes(t)) catalog.push(t);
+  state.settings.galleryTagsCatalog = catalog;
+  const meta = getPackMeta(state.galDetail.item.id);
+  if (!meta.tags.includes(t)) meta.tags.push(t);
+  inp.value = '';
+  await persistSettings();
+  populateGalleryTagFilter();
+  renderGalDetailTags();
+  renderGalleryTable();
+}
+
+function renderGalDetailCustomCols() {
+  if (!state.galDetail) return;
+  const customCols = state.settings.galleryCustomCols || [];
+  const wrap = document.getElementById('galDetCustomColsWrap');
+  wrap.classList.toggle('hidden', customCols.length === 0);
+  if (!customCols.length) return;
+  const meta = getPackMeta(state.galDetail.item.id);
+  const fields = document.getElementById('galDetCustomColsFields');
+  fields.innerHTML = '';
+  customCols.forEach(col => {
+    const div = document.createElement('div');
+    const lbl = document.createElement('label');
+    lbl.className = 'field';
+    lbl.textContent = col.label;
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.value = (meta.custom && meta.custom[col.key]) || '';
+    inp.placeholder = `Valor para ${col.label}...`;
+    inp.onchange = async () => {
+      meta.custom[col.key] = inp.value.trim();
+      await persistSettings();
+      renderGalleryTable();
+    };
+    div.appendChild(lbl);
+    div.appendChild(inp);
+    fields.appendChild(div);
+  });
+}
+
+function renderGalDetailLists() {
+  if (!state.galDetail) return;
+  const plBox = document.getElementById('galDetPlBox');
+  plBox.innerHTML = '';
+  if (!state.galDetail.playlists.length) {
+    plBox.innerHTML = '<div style="padding:12px;color:var(--dim);font-size:12px">Nenhuma playlist neste pacote.</div>';
+  } else {
+    state.galDetail.playlists.forEach(pl => {
+      const row = document.createElement('label');
+      row.className = 'pl-row';
+      row.innerHTML = `<span style="display:flex;align-items:center;gap:8px"><input type="checkbox" ${pl.checked ? 'checked' : ''} /><span>${escapeHtml(pl.path)}</span></span><span class="pl-count">${pl.trackCount} faixas</span>`;
+      row.querySelector('input').onchange = ev => { pl.checked = ev.target.checked; };
+      plBox.appendChild(row);
+    });
+  }
+
+  const sBox = document.getElementById('galDetSampBox');
+  sBox.innerHTML = '';
+  state.galDetail.samples.forEach(item => {
+    const row = document.createElement('label');
+    row.className = 'pl-row';
+    const grpTag = item.group ? `<span class="tag-bank">${escapeHtml(item.group)}</span>` : '';
+    const editTag = item.editsLabel ? `<span class="tag-bank" style="color:var(--accent)">${escapeHtml(item.editsLabel)}</span>` : '';
+    row.innerHTML = `<span style="display:flex;align-items:center;gap:7px;min-width:0;flex-wrap:wrap"><input type="checkbox" ${item.checked ? 'checked' : ''} /><span>${escapeHtml(item.name)}</span>${grpTag}${editTag}</span><span class="pl-count">${escapeHtml(item.sizeLabel || '')}</span>`;
+    row.querySelector('input').onchange = ev => { item.checked = ev.target.checked; };
+    sBox.appendChild(row);
+  });
+}
+
+function toggleAllGalDet(kind, val) {
+  if (!state.galDetail) return;
+  (kind === 'pl' ? state.galDetail.playlists : state.galDetail.samples).forEach(x => x.checked = val);
+  renderGalDetailLists();
+}
+
+async function revealCurrentGalleryPack() {
+  if (!state.galDetail) return;
+  try { await api('/api/fs/reveal', { path: state.galDetail.sourcePath }); }
+  catch (e) { await uiError(e.message); }
+}
+
+async function runImportFromGallery(reloadMode = false) {
+  if (!state.galDetail) return;
+  const selectedPl = state.galDetail.playlists.filter(p => p.checked).map(p => p.path);
+  const selectedSamp = state.galDetail.samples.filter(s => s.checked).map(s => s.relPath);
+  const apPrefs = state.galDetail.includesRbPrefs && document.getElementById('galDetApplyPrefs').checked;
+  const apFx = state.galDetail.includesRbFx && document.getElementById('galDetApplyFx').checked;
+  const apMidi = state.galDetail.includesRbMidi && document.getElementById('galDetApplyMidi').checked;
+  if (!selectedPl.length && !selectedSamp.length && !apPrefs && !apFx && !apMidi) {
+    return await uiAlert('Selecione ao menos uma playlist, sample ou configuração para importar.', 'Nada selecionado', 'warning');
+  }
+
+  const applyPads = state.galDetail.hasSamplerPadEdits && document.getElementById('galDetApplyPads').checked && selectedSamp.length > 0;
+  let rbRunning = false;
+  try { rbRunning = !!(await api('/api/status')).isRunning; } catch (_) {}
+
+  const restartReasons = [];
+  if (applyPads) restartReasons.push('Samples e edições dos pads do Sampler (SamplerSettings1.xml: bancos, slots, gain, loop e sync)');
+  if (apPrefs) restartReasons.push('Preferências do Rekordbox (rekordbox3.settings, browseSetting.xml, PlaySettings.xml)');
+  if (apFx) restartReasons.push('Efeitos configurados do Rekordbox (FX Units, Pad FX e Beat FX)');
+  if (apMidi) restartReasons.push('Configurações de MIDI e mapeamentos');
+  if (selectedPl.length > 0 && rbRunning) restartReasons.push('Configuração do caminho da Biblioteca Importada XML nas preferências do Rekordbox');
+
+  let shouldRestart = false;
+  if (restartReasons.length > 0) {
+    const choice = await showAppDialog({
+      title: 'Reinicialização do Rekordbox necessária',
+      tone: 'warning',
+      message: 'O Rekordbox precisará ser reiniciado por conta de:',
+      bullets: restartReasons,
+      buttons: [
+        { id: 'restart', label: 'Importar e Reiniciar', kind: 'primary' },
+        { id: 'no_restart', label: 'Importar sem Reiniciar', kind: 'sec' },
+        { id: 'cancel', label: 'Cancelar', kind: 'sec' },
+      ],
+    });
+    if (choice.action === 'cancel') return;
+    shouldRestart = (choice.action === 'restart');
+  }
+
+  const btn = document.getElementById('btnGalImportSelected');
+  btn.disabled = true; btn.textContent = shouldRestart ? 'Reiniciando e importando...' : 'Importando...';
+  showBusy('Importando pacote...', 'Extraindo músicas, samples e aplicando configurações. Pacotes grandes podem levar alguns instantes...');
+  try {
+    if (shouldRestart && rbRunning) {
+      await api('/api/rb/close', {});
+      await new Promise(r => setTimeout(r, 1100));
+    }
+    const res = await api('/api/xml/import', {
+      sourcePath: state.galDetail.sourcePath,
+      selectedPaths: selectedPl,
+      selectedSampleRelPaths: state.galDetail.samples.length > 0 ? selectedSamp : null,
+      applySamplerSettings: document.getElementById('galDetApplyPads').checked,
+      samplesConfigOnly: reloadMode || document.getElementById('galDetSamplesConfigOnly').checked,
+      reloadOnly: !!reloadMode,
+      applyRbPrefs: apPrefs,
+      applyRbFx: apFx,
+      applyRbMidi: apMidi,
+      targetMusicDir: document.getElementById('plImportDest').value,
+    });
+    if (shouldRestart) {
+      try { await api('/api/rb/open', {}); setTimeout(refreshStatus, 1800); } catch (_) {}
+    }
+    const d = res.result;
+    closeGalleryDetail();
+    syncGallery(false);
+    hideBusy();
+    await uiAlert(`Importação concluída!
+
+Playlists: ${d.playlistCount} | Samples extraídos: ${d.extractedSamplesCount || 0}${d.appliedSamplerPadsCount > 0 ? ' | Pads aplicados no Sampler: ' + d.appliedSamplerPadsCount : ''}`, 'Pacote Importado', 'success');
+  } catch (e) {
+    hideBusy();
+    await uiError(e.message, 'Erro ao Importar da Galeria');
+  } finally {
+    hideBusy();
+    btn.disabled = false; btn.textContent = 'Importar Selecionados';
+  }
+}
+
+/* ---- Columns & Tags Catalog Modals ---- */
+
+async function renameGalleryPack(item) {
+  const newName = await uiPrompt(
+    `Novo nome para o pacote "${item.name}":\n(Isso renomeará o arquivo/pasta diretamente no seu computador.)`,
+    item.name,
+    'Renomear Pacote'
+  );
+  if (newName === null || !newName.trim() || newName.trim() === item.name) return;
+  try {
+    await api('/api/gallery/rename', { path: item.path, newName: newName.trim() });
+    await loadInitialSettings();
+    await syncGallery(false);
+    await uiAlert(`Pacote renomeado para "${newName.trim()}".`, 'Renomeado', 'success');
+  } catch (e) { await uiError(e.message, 'Erro ao Renomear'); }
+}
+
+async function duplicateGalleryPack(item) {
+  const newName = await uiPrompt(
+    `Nome para a cópia de "${item.name}":\n(Será criada uma cópia real do arquivo/pasta no seu computador.)`,
+    `${item.name}_Copia`,
+    'Duplicar Pacote'
+  );
+  if (newName === null || !newName.trim()) return;
+  try {
+    await api('/api/gallery/duplicate', { path: item.path, newName: newName.trim() });
+    await loadInitialSettings();
+    await syncGallery(false);
+    await uiAlert(`Cópia "${newName.trim()}" criada com sucesso!`, 'Pacote Duplicado', 'success');
+  } catch (e) { await uiError(e.message, 'Erro ao Duplicar'); }
+}
+
+async function deleteGalleryPack(item) {
+  const ok = await uiConfirm(
+    `Tem certeza que deseja excluir permanentemente o pacote "${item.name}"?\n\nArquivo/Pasta no PC:\n${item.path}\n\nEsta ação apaga os arquivos do disco e não pode ser desfeita.`,
+    'Excluir Pacote do Computador',
+    'Excluir Permanentemente',
+    'error'
+  );
+  if (!ok) return;
+  try {
+    await api('/api/gallery/delete', { path: item.path });
+    await loadInitialSettings();
+    await syncGallery(false);
+    await uiAlert(`Pacote "${item.name}" excluído do computador.`, 'Excluído', 'success');
+  } catch (e) { await uiError(e.message, 'Erro ao Excluir'); }
+}
+
+function openGalleryColsModal() {
+  const vis = state.settings.galleryVisibleCols || GAL_STD_COLS.map(c => c.key);
+  const stdBox = document.getElementById('galStdColsList');
+  stdBox.innerHTML = '';
+  GAL_STD_COLS.forEach(c => {
+    const lbl = document.createElement('label');
+    lbl.className = 'check-row';
+    lbl.innerHTML = `<input type="checkbox" ${vis.includes(c.key) ? 'checked' : ''} /><span>${escapeHtml(c.label)}</span>`;
+    lbl.querySelector('input').onchange = async ev => {
+      let next = [...(state.settings.galleryVisibleCols || GAL_STD_COLS.map(x => x.key))];
+      if (ev.target.checked) { if (!next.includes(c.key)) next.push(c.key); }
+      else next = next.filter(k => k !== c.key);
+      state.settings.galleryVisibleCols = next;
+      await persistSettings();
+      renderGalleryTable();
+    };
+    stdBox.appendChild(lbl);
+  });
+  renderGalleryCustomColsManager();
+  document.getElementById('galColsModal').classList.remove('hidden');
+}
+function closeGalleryColsModal() { document.getElementById('galColsModal').classList.add('hidden'); }
+
+function renderGalleryCustomColsManager() {
+  const box = document.getElementById('galCustomColsList');
+  const cols = state.settings.galleryCustomCols || [];
+  if (!cols.length) {
+    box.innerHTML = '<div style="font-size:12px;color:var(--dim)">Nenhuma coluna personalizada criada.</div>';
+    return;
+  }
+  box.innerHTML = '';
+  cols.forEach((c, idx) => {
+    const row = document.createElement('div');
+    row.className = 'profile-row';
+    row.innerHTML = `<span>${escapeHtml(c.label)}</span><div class="row" style="gap:6px"><button class="btn btn-sec" style="padding:4px 9px;font-size:11px" onclick="renameGalleryCustomCol(${idx})">Renomear</button><button class="btn btn-danger" onclick="deleteGalleryCustomCol(${idx})">✕</button></div>`;
+    box.appendChild(row);
+  });
+}
+
+async function addGalleryCustomCol() {
+  const inp = document.getElementById('galNewColName');
+  const label = inp.value.trim();
+  if (!label) return;
+  const key = 'c_' + Date.now();
+  const cols = state.settings.galleryCustomCols || [];
+  cols.push({ key, label });
+  state.settings.galleryCustomCols = cols;
+  inp.value = '';
+  await persistSettings();
+  renderGalleryCustomColsManager();
+  renderGalleryTable();
+}
+
+async function renameGalleryCustomCol(idx) {
+  const col = (state.settings.galleryCustomCols || [])[idx];
+  if (!col) return;
+  const n = await uiPrompt('Novo nome da coluna:', col.label, 'Renomear Coluna');
+  if (!n || !n.trim()) return;
+  col.label = n.trim();
+  await persistSettings();
+  renderGalleryCustomColsManager();
+  renderGalleryTable();
+}
+
+async function deleteGalleryCustomCol(idx) {
+  const cols = state.settings.galleryCustomCols || [];
+  cols.splice(idx, 1);
+  state.settings.galleryCustomCols = cols;
+  await persistSettings();
+  renderGalleryCustomColsManager();
+  renderGalleryTable();
+}
+
+function openGalleryTagsModal() {
+  renderCatalogTagsList();
+  document.getElementById('galTagsModal').classList.remove('hidden');
+}
+function closeGalleryTagsModal() { document.getElementById('galTagsModal').classList.add('hidden'); }
+
+function renderCatalogTagsList() {
+  const box = document.getElementById('galCatalogTagsList');
+  const tags = state.settings.galleryTagsCatalog || [];
+  if (!tags.length) {
+    box.innerHTML = '<div style="font-size:12px;color:var(--dim)">Nenhuma tag cadastrada.</div>';
+    return;
+  }
+  box.innerHTML = '';
+  tags.forEach((t, idx) => {
+    const row = document.createElement('div');
+    row.className = 'profile-row';
+    row.innerHTML = `<span class="tag-chip active" style="margin:0">${escapeHtml(t)}</span><button class="btn btn-danger" onclick="deleteCatalogTag(${idx})">Remover</button>`;
+    box.appendChild(row);
+  });
+}
+
+async function addCatalogTag() {
+  const inp = document.getElementById('galCatalogNewTag');
+  const t = inp.value.trim();
+  if (!t) return;
+  const tags = state.settings.galleryTagsCatalog || [];
+  if (!tags.includes(t)) tags.push(t);
+  state.settings.galleryTagsCatalog = tags;
+  inp.value = '';
+  await persistSettings();
+  populateGalleryTagFilter();
+  renderCatalogTagsList();
+}
+
+async function deleteCatalogTag(idx) {
+  const tags = state.settings.galleryTagsCatalog || [];
+  const removed = tags.splice(idx, 1)[0];
+  state.settings.galleryTagsCatalog = tags;
+  const meta = state.settings.galleryMeta || {};
+  Object.keys(meta).forEach(k => {
+    if (Array.isArray(meta[k].tags)) meta[k].tags = meta[k].tags.filter(x => x !== removed);
+  });
+  await persistSettings();
+  populateGalleryTagFilter();
+  renderCatalogTagsList();
+  renderGalleryTable();
+}
+
+const VAULT_EASTER_EGGS = ["Levanta essa laje!", "Isso sim é qualidade duvidosa!", "Muito acima do nível normal de bruxaria!", "Te pego pela cabeça e te jooj!", "Parabens! Essa é uma mensagem de Easter-egg com 0,001% de chance de aparecer!"];
+const VAULT_REGULAR_QUOTES = ["Se o pendrive não falhou na hora do drop, o set já valeu a pena.", "Hot cue organizado é terapia para quem toca às 4 da manhã.", "O DJ chega com 500 músicas e toca as mesmas 12 que a pista ama.", "Quem nunca deu pause no deck errado que atire a primeira agulha.", "Beatgrid torto é o teste de paciência oficial de todo DJ.", "Sincronizar no ouvido é arte; apertar Sync e sorrir é sobrevivência.", "A música favorita do DJ sempre tem 130 BPM e 8 minutos de intro.", "Nunca confie em um cabo RCA que só funciona quando fica dobrado.", "Todo DJ tem uma pasta chamada 'Nova Pasta (3)' cheia de pedradas.", "Se o grave não tremeu o copo no balcão, ainda cabe mais um pouquinho.", "Pedir música pro DJ no meio da virada devia dar cartão amarelo.", "O segredo do bom set: 50% pesquisa musical, 50% fingir que o erro foi efeito.", "Quando o fone quebra no meio da festa, o DJ desbloqueia o sexto sentido.", "Rekordbox analisando 2.000 faixas na véspera do show: emoção pura.", "A pista não sabe o nome da música, mas sabe a hora exata de gritar.", "Um bom loop salva mais vidas que café forte de madrugada.", "Quem disse que dinheiro não traz felicidade nunca comprou uma controladora nova.", "O único exercício físico que o DJ faz: carregar case de equipamento na escada.", "Volume no vermelho não deixa a música mais alta, só deixa o técnico chorando.", "A melhor transição da sua vida sempre acontece quando ninguém está filmando.", "Set planejado dura exatamente até a terceira música da pista.", "Backup do pendrive: você só lembra que precisa quando o principal some.", "Se tem sample de sirene no pad, a tentação de apertar é maior que a razão.", "O fader de pitch é o verdadeiro volante da madrugada.", "DJ que organiza playlist por energia dorme mais tranquilo.", "Checar o adaptador P2/P10 antes de sair de casa evita 90% dos sustos.", "Aquele momento mágico em que o BPM casa sem nem encostar no jog.", "Toda festa tem alguém perguntando se você tem um carregador de celular na cabine.", "Quando o drop bate certo, até quem estava sentado levanta a sobrancelha.", "Cabine apertada + copo sem tampa = filme de terror em tempo real.", "Não é bagunça no HD, é curadoria musical em estado bruto.", "O verdadeiro luxo do DJ é tocar com retorno que realmente funciona.", "Baixar faixa em 128 kbps e achar que ninguém vai notar no PA gigante: clássico.", "Aquele silêncio de 0,5 segundo que pareceu 3 horas quando o cabo soltou.", "Testar o microfone com 'alô, som' ainda é patrimônio cultural mundial.", "Quando você encontra a acapella perfeita, o sorriso vai de orelha a orelha.", "DJ raiz sabe o nome da música pelo desenho da waveform.", "Nada supera a paz interior de ver o pendrive exportado em 100%.", "A pista pediu 'uma mais animada' durante um funk de 150 BPM.", "Quem nunca fingiu mexer no EQ só para dar um charme no vídeo?", "Se o filtro passa-baixa resolver tudo, por que complicar?", "Tocar de dia é ótimo, pena que não dá para enxergar os LEDs da CDJ.", "Aquele amigo que sobe na cabine só para apontar para o botão de Play.", "O melhor amigo do DJ na madrugada é o técnico de som bem-humorado.", "Música boa não tem idade, mas o arquivo WAV tem 70 MB.", "Quando a fila de pedidos vira um bingo de gêneros improváveis.", "Todo DJ tem uma faixa secreta que só toca quando a pista já está entregue.", "Se o echo out salvou a virada, merece respeito eterno.", "A única hora em que o DJ corre é quando faltam 10 segundos para a música acabar.", "Organizar tags no domingo à tarde: o autocuidado do DJ moderno.", "O drama de escolher entre comer antes do show ou passar mais uma música.", "Quando o pen drive reserva vira o herói da noite.", "Ninguém entende por que o DJ tem 4 fones, mas todos têm um propósito nobre.", "Aquele frio na barriga gostoso na primeira faixa do set.", "Se a pista cantou o refrão junto, pode colocar no currículo.", "O cabo USB sempre entra do lado errado nas duas primeiras tentativas.", "Playlist 'Definitiva_Final_AGORA_VAI_v7': todos nós temos uma.", "O DJ olha para o relógio e descobre que tocou 3 horas achando que eram 40 minutos.", "Quem nunca dançou sozinho no quarto testando virada não viveu direito.", "Quando o grave entra limpo, até a alma dá uma alinhada.", "A arte milenar de ler a pista em 15 segundos.", "Não mexe no meu gain que eu não mexo no seu drink.", "Ter 3 pendrives idênticos não é paranoia, é sabedoria ancestral.", "O som da agulha tocando o vinil ainda arrepia qualquer geração.", "Quando o sampler dispara no tempo exato e você se sente um maestro.", "A pista vazia às 22h e lotada às 2h: a montanha-russa emocional de todo rolê.", "Nenhum boleto assusta quem já encarou uma CDJ travando no meio do drop.", "Se o remix tem mais energia que o café da manhã, entra no set.", "O verdadeiro superpoder do DJ é ouvir duas músicas ao mesmo tempo e achar normal.", "Passar o som é 10% ajuste técnico e 90% curtir a acústica vazia.", "Aquele momento em que você acerta o tom harmônico sem olhar a tabela Camelot.", "Quando a luz estrobo liga e ninguém mais sabe onde está o botão Cue.", "O DJ que leva extensão elétrica própria já atingiu a iluminação.", "Nada dói mais do que esquecer qual era o nome daquela faixa incrível de ontem.", "Um bom mashup transforma estranhos em melhores amigos na pista.", "Se o subgrave fizer a calça vibrar, o técnico acertou a mão.", "A eterna batalha entre deixar a faixa respirar e já emendar a próxima.", "Todo produtor promete terminar a música hoje e cria mais 4 projetos novos.", "Aquele susto quando o botão Vinyl Mode está desligado sem você saber.", "Festa boa é quando o DJ termina o set e a pista ainda pede mais uma.", "A cara de concentração máxima para apertar um único botão no tempo certo.", "Quem nunca ficou 2 horas procurando um snare que ninguém vai notar?", "Se o BPM pulou de 100 para 130 suave, pode chamar de mágica.", "O fone no pescoço é o crachá oficial da madrugada.", "Cabine com ventilador apontado pro rosto vale mais que cachê dobrado.", "Quando o público acende a lanterna do celular no refrão: arrepio garantido.", "O verdadeiro DJ reconhece uma música só pelos primeiros 2 segundos de chimbal.", "Se deu tempo de beber água durante o break, o planejamento está em dia.", "Aquele momento tenso esperando o Rekordbox reconhecer o pendrive na hora H.", "Fazer a pista sorrir é o melhor retorno de palco que existe.", "Quando o grave cai na hora certa, ninguém lembra da segunda-feira.", "A coleção de músicas cresce mais rápido que o espaço livre no SSD.", "Todo DJ já olhou para a mesa e pensou: 'para que serve esse knob mesmo?'", "O melhor efeito do mixer continua sendo escolher a música certa na hora certa.", "Quando você testa um sample novo e a pista inteira reage na hora.", "Não existe horário comercial para inspiração musical.", "Aquele alívio indescritível quando o equipamento liga de primeira.", "Tocar para 20 pessoas animadas vale mais que 2.000 olhando o relógio.", "Se o crossfader está no lugar errado, a surpresa vem rápido.", "Quem nunca pesquisou música nova às 3h da manhã dizendo 'só mais uma'?", "O groove certo resolve qualquer clima pesado em 8 compassos.", "Quando a transição sai tão lisa que nem você percebeu onde mudou.", "A bolsa do DJ pesa 12 quilos e metade disso são adaptadores.", "O verdadeiro teste de amizade é segurar o fone enquanto o DJ ajusta o cabo.", "Se a pista pediu bis, o dever foi cumprido com louvor.", "Nada como um bom break para olhar a pista inteira com os braços pra cima.", "O DJ não atrasa: ele chega no tempo exato do build-up.", "Quando a música acaba de baixar 5 minutos antes de sair pro show: adrenalina.", "Um bom set conta uma história sem precisar dizer uma única palavra.", "Aquele sorriso discreto quando você vê alguém usando Shazam na frente da cabine.", "Se o beat casou no primeiro toque, a noite promete.", "O segredo dos grandes sets: nunca subestime um clássico bem encaixado.", "Quando você salva o backup antes de mexer nas configs: paz de espírito.", "A pista sempre perdoa um pequeno escorregão, mas nunca perdoa falta de energia.", "Testar o novo efeito em casa antes do show evita surpresas criativas demais.", "O relógio corre em 2x quando a cabine está boa.", "Quem ama música nunca fica realmente sem assunto.", "Aquele momento em que o grave entra e o sorriso da pista acende junto.", "Um pendrive bem etiquetado evita drama na troca de DJ.", "Quando o DJ anterior deixa o filtro todo fechado e você descobre no susto.", "A vida é curta demais para tocar música que você não curte.", "Se o loop de 4 tempos encaixou perfeito, dá vontade de deixar pra sempre.", "Aquele clássico momento de procurar o adaptador P10 em todos os bolsos.", "O verdadeiro DJ já sabe quando o drop vem só pelo olhar da pista.", "Misturar estilos improváveis e dar certo é a melhor sensação da cabine.", "Quando o set flui tão bem que parece que o tempo parou.", "O som perfeito começa com arquivos organizados e termina com a pista suada.", "Todo DJ tem uma pasta 'Emergência' que já salvou várias noites.", "Aquele silêncio estratégico antes do refrão que faz todo mundo gritar.", "Se você balançou a cabeça testando a playlist, ela está aprovada.", "Quando o técnico faz sinal de joinha, o DJ respira aliviado.", "Nada substitui o olho no olho com a pista na hora da virada.", "O melhor plug-in do mundo ainda é bom gosto musical.", "Aquele momento glorioso em que todas as pastas finalmente fazem sentido.", "Quando o grave abraça o ambiente inteiro, a magia acontece.", "DJ que chega cedo passa o som com calma e ainda escolhe o melhor ângulo.", "A pista nunca mente: se o pé começou a bater, você acertou.", "Um bom acapella sobre a batida certa vale ouro puro.", "Quando você acha aquele remix raro que procurava há meses: festa particular.", "Se o botão Sync piscou, finge que foi só para checar o BPM.", "A melhor parte de ser DJ é transformar uma música desconhecida em favorita de alguém.", "Aquele alívio quando o notebook não resolve atualizar no meio do rolê.", "Quem nunca bateu o dedo no pad de sample sem querer e disfarçou com estilo?", "Organizar a biblioteca hoje para agradecer a si mesmo no sábado.", "O coração do DJ bate em 4 por 4.", "Quando a virada surpreende até o outro DJ da cabine: missão cumprida.", "Se tem grave, ritmo e carinho na curadoria, a pista responde.", "Aquele instante de pura paz quando o export termina sem nenhum erro.", "O segredo da longevidade na cabine: cuidar dos ouvidos tanto quanto das playlists.", "Quando a última música do set deixa gostinho de quero mais.", "Um bom cue point colocado com calma vale por dez improvisos no susto.", "A pista ama surpresas, especialmente quando vêm no tempo certo.", "Aquele sorriso quando você lembra exatamente qual música casa com a atual.", "Cabine organizada, mente tranquila, pista feliz.", "Quando o sample entra no contratempo perfeito, até a luz parece brilhar mais.", "Se a música te arrepiou no fone, ela merece ganhar a pista.", "Todo grande set começa com uma primeira faixa escolhida com o coração.", "O verdadeiro poder do DJ: mudar o humor de uma sala inteira em 30 segundos.", "Quando o grave limpa a mente e o ritmo toma conta do corpo.", "A eterna dúvida: tocar o hit agora ou segurar mais dez minutos para explodir?", "Se o público filmou a virada, pode ter certeza que encaixou bonito.", "Aquele prazer silencioso de ver todos os hot cues coloridinhos e alinhados.", "Nada supera o calor de uma pista cantando em coro.", "Quando o fone isola o mundo e só existe o próximo compasso.", "Um bom DJ ouve a música que está tocando e já sente a próxima.", "A pista é o único gráfico de desempenho que realmente importa.", "Quando o groove é bom, ninguém olha para o celular.", "Aquele momento em que você encontra a ponte perfeita entre dois estilos.", "Se o equipamento está em dia e o backup está salvo, o resto é diversão.", "Tocar música é dividir um pedaço da sua coleção de memórias com a pista.", "Quando o drop cai e todo mundo ergue as mãos no mesmo segundo.", "O melhor aquecimento antes do set: ouvir aquela faixa que te dá confiança.", "Quem pesquisa música com paixão nunca fica sem carta na manga.", "Aquele clássico momento de testar o volume no fone antes de subir o fader.", "Se a transição arrancou um 'eita!' da pista, pode comemorar.", "O verdadeiro DJ transforma até problema técnico em parte do show.", "Quando a linha de baixo conversa direto com o coração da pista.", "A magia acontece nos 16 compassos em que duas músicas viram uma só.", "Se a playlist está redonda, até a montagem do equipamento fica mais leve.", "Nada como redescobrir uma faixa antiga na pasta e ver ela incendiar a pista.", "Quando o ritmo puxa e ninguém consegue ficar parado.", "O sorriso de quem finalmente organizou os samples e efeitos num pacote só.", "A pista agradece cada minuto que você passou garimpando som novo.", "Quando o último acorde ecoa e a energia continua no ar.", "Música boa é aquela que faz o tempo desaparecer por algumas horas.", "Se o coração acelerou na virada, a pista sentiu junto.", "O melhor equipamento é aquele que você conhece de olhos fechados.", "Quando o beat entra redondo, tudo no mundo parece se encaixar.", "Aquele prazer único de fechar o set com a faixa que ninguém esperava.", "Garimpar música nova é como achar tesouro escondido toda semana.", "Se a pista saiu suada e sorrindo, o set entrou para a história.", "Quando o som bate limpo, não precisa de mais nada.", "A cabine é pequena, mas a viagem sonora é gigante.", "Cada playlist guardada é um retrato de uma noite inesquecível.", "Aperta o play, confia na curadoria e deixa o grave fazer o resto."];
+/* ---- GitHub Releases Auto-Updater (Item 40) ---- */
+async function refreshDownloadedUpdatesList() {
+  const box = document.getElementById('cfgDownloadedUpdatesList');
+  if (!box) return;
+  try {
+    const r = await api('/api/updates/list', {});
+    const files = r.files || [];
+    if (!files.length) {
+      box.innerHTML = '<div style="font-size:12px;color:var(--dim);padding:4px 2px">Nenhuma atualização baixada ainda.</div>';
+      return;
+    }
+    box.innerHTML = '';
+    files.forEach(f => {
+      const row = document.createElement('div');
+      row.className = 'profile-row';
+      row.innerHTML = `<div style="min-width:0"><strong style="color:var(--text);font-size:12.5px">${escapeHtml(f.name)}</strong><div style="font-size:11px;color:var(--dim)">${escapeHtml(f.sizeLabel)} • ${escapeHtml(f.date)}</div></div>
+        <div class="row" style="gap:6px">
+          <button class="btn btn-primary" style="padding:4px 9px;font-size:11.5px">Instalar</button>
+          <button class="btn btn-sec" style="padding:4px 8px;font-size:11.5px">Pasta</button>
+          <button class="btn btn-danger" style="padding:4px 8px;font-size:11.5px">✕</button>
+        </div>`;
+      const btns = row.querySelectorAll('button');
+      btns[0].onclick = () => launchDownloadedUpdate(f.path, f.name);
+      btns[1].onclick = () => api('/api/fs/reveal', { path: f.path }).catch(e => uiError(e.message));
+      btns[2].onclick = async () => {
+        if (!(await uiConfirm(`Excluir o arquivo baixado "${f.name}"?`, 'Excluir Versão Baixada', 'Excluir', 'danger'))) return;
+        await api('/api/updates/delete', { path: f.path });
+        refreshDownloadedUpdatesList();
+      };
+      box.appendChild(row);
+    });
+  } catch (e) {
+    box.innerHTML = `<div style="font-size:12px;color:var(--dim)">Erro ao listar versões: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+async function launchDownloadedUpdate(filePath, fileName) {
+  const choice = await showAppDialog({
+    title: 'Reinicialização necessária para atualizar',
+    tone: 'warning',
+    message: `Para instalar "${fileName}" corretamente, o Rekordbox Vault precisará ser fechado/reiniciado durante a instalação.`,
+    buttons: [
+      { id: 'open_close', label: 'Abrir instalador e fechar o Vault', kind: 'primary' },
+      { id: 'open_only', label: 'Apenas abrir instalador', kind: 'sec' },
+      { id: 'cancel', label: 'Cancelar', kind: 'sec' },
+    ],
+  });
+  if (choice.action === 'cancel') return;
+  try {
+    await api('/api/updates/open', { path: filePath });
+    if (choice.action === 'open_close') {
+      await api('/api/app/quit', {});
+    }
+  } catch (e) { await uiError(e.message, 'Erro ao abrir instalador'); }
+}
+
+async function performUpdateDownload(info) {
+  if (!info.assetUrl) {
+    window.open(info.releaseUrl, '_blank');
+    return;
+  }
+  showBusy(`Baixando ${info.latestVersion}...`, `Arquivo: ${info.assetName} (${info.assetSize || ''})`);
+  try {
+    const r = await api('/api/updates/download', { assetUrl: info.assetUrl, assetName: info.assetName });
+    hideBusy();
+    refreshDownloadedUpdatesList();
+    await launchDownloadedUpdate(r.result.filePath, r.result.fileName);
+  } catch (e) {
+    hideBusy();
+    await uiError(e.message, 'Erro ao baixar atualização');
+  }
+}
+
+async function checkUpdatesManual() {
+  const btn = document.getElementById('btnCheckUpdatesNow');
+  const statusBox = document.getElementById('cfgUpdateStatusBox');
+  if (btn) { btn.disabled = true; btn.textContent = 'Verificando...'; }
+  try {
+    const res = await api('/api/updates/check', {});
+    const d = res.data;
+    if (d.hasUpdate) {
+      statusBox.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <span><strong style="color:var(--green)">Nova versão disponível: ${escapeHtml(d.latestVersion)}</strong> (atual: ${escapeHtml(d.currentVersion)})</span>
+        <button id="btnInlineDlUpd" class="btn btn-primary" style="padding:5px 11px;font-size:12px">Baixar ${escapeHtml(d.latestVersion)}</button>
+      </div>`;
+      document.getElementById('btnInlineDlUpd').onclick = () => performUpdateDownload(d);
+    } else if (d.noReleasesYet) {
+      statusBox.innerHTML = `Versão atual: <strong style="color:var(--text)">${escapeHtml(d.currentVersion)}</strong> • Nenhum release publicado ainda em <code>${escapeHtml(d.repo)}</code>.`;
+    } else {
+      statusBox.innerHTML = `<strong style="color:var(--green)">✓ Você já está na versão mais recente (${escapeHtml(d.currentVersion)})!</strong>`;
+    }
+    refreshDownloadedUpdatesList();
+  } catch (e) {
+    statusBox.innerHTML = `<span style="color:var(--amber)">Não foi possível checar atualizações: ${escapeHtml(e.message)}</span>`;
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '↻ Procurar atualizações'; }
+  }
+}
+
+async function checkForUpdatesOnStartup() {
+  try {
+    const res = await api('/api/updates/check', {});
+    const d = res.data;
+    if (!d || !d.hasUpdate) return;
+    const notesTxt = d.releaseNotes ? `\n\nNovidades:\n${d.releaseNotes.slice(0, 420)}` : '';
+    const choice = await showAppDialog({
+      title: `Nova atualização disponível (${d.latestVersion})`,
+      tone: 'info',
+      message: `Você está usando a versão ${d.currentVersion}, mas a versão ${d.latestVersion} já está disponível no GitHub!${notesTxt}`,
+      buttons: [
+        { id: 'update', label: d.assetName ? `Atualizar agora (${d.assetSize || d.latestVersion})` : 'Abrir no GitHub', kind: 'primary' },
+        { id: 'skip', label: 'Seguir sem atualizar', kind: 'sec' },
+      ],
+    });
+    if (choice.action === 'update') {
+      await performUpdateDownload(d);
+    }
+  } catch (_) {}
+}
+
+function renderStartupQuote() {
+  const el = document.getElementById('topbarQuote');
+  if (!el) return;
+  // 0.001% chance (0.00001) to trigger one of the 5 easter-eggs; otherwise 1 of the 195 regular quotes
+  let chosen;
+  if (Math.random() < 0.00001) {
+    chosen = VAULT_EASTER_EGGS[Math.floor(Math.random() * VAULT_EASTER_EGGS.length)];
+  } else {
+    chosen = VAULT_REGULAR_QUOTES[Math.floor(Math.random() * VAULT_REGULAR_QUOTES.length)];
+  }
+  el.textContent = `"${chosen}"`;
+}
+(async function boot() {
+  renderStartupQuote();
+  await loadInitialSettings();
+  syncAudioToggleCards();
+  await refreshStatus();
+  initGalleryInputs();
+  renderExportTagsChips();
+  detectRbConfigExtras();
+  detectRbSampler(false);
+  if (!state.settings.advancedMode) {
+    loadDirectFromRekordboxDb(true);
+  }
+  setTimeout(checkForUpdatesOnStartup, 1800);
+})();
+// Keep-alive heartbeat for automatic server shutdown in browser fallback mode
+(function initVaultHeartbeat() {
+  const ping = () => fetch('/api/heartbeat', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: '{}', keepalive: true }).catch(() => {});
+  ping();
+  setInterval(ping, 3000);
+  window.addEventListener('pagehide', () => {
+    try {
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/api/client-bye', new Blob(['{}'], { type: 'application/json' }));
+      }
+    } catch (_) {}
+  });
+})();
+</script>
+</body>
+</html>

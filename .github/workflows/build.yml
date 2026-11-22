@@ -1,0 +1,141 @@
+name: Build Rekordbox Vault (Win + macOS Intel & Apple Silicon)
+
+on:
+  push:
+    tags:
+      - 'v*'
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Versao para a build (ex: 0.3.0)'
+        required: false
+        default: '0.3.0'
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Windows Setup (.exe)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip wheel
+          pip install pyrekordbox sqlcipher3-wheels pywebview pyinstaller
+
+      - name: Definir versao
+        id: ver
+        shell: pwsh
+        run: |
+          $raw = "${{ github.event.inputs.version }}"
+          if (-not $raw) { $raw = "${{ github.ref_name }}" }
+          $clean = $raw -replace '^v',''
+          if (-not ($clean -match '^\d+\.\d+')) { $clean = '0.3.0' }
+          echo "version=$clean" >> $env:GITHUB_OUTPUT
+
+      - name: Compilar RekordboxVault.exe com PyInstaller
+        run: |
+          pyinstaller --noconfirm --clean --windowed --onedir ^
+            --name "RekordboxVault" ^
+            --icon "app/icon.ico" ^
+            --splash "app/splash.png" ^
+            --add-data "app/ui.html;app" ^
+            --add-data "app/icon.png;app" ^
+            --add-data "app/icon.ico;app" ^
+            --collect-all pyrekordbox ^
+            --collect-all sqlcipher3 ^
+            --collect-all webview ^
+            app/server.py
+
+      - name: Gerar Instalador Windows (.exe) com Inno Setup
+        run: |
+          iscc /DAppVersion=${{ steps.ver.outputs.version }} build\installer_win.iss
+
+      - name: Upload artefato Windows
+        uses: actions/upload-artifact@v4
+        with:
+          name: RekordboxVault-Windows
+          path: dist_installers/*.exe
+
+  build-macos:
+    name: macOS ${{ matrix.arch_label }} (.dmg)
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15-intel
+            arch_label: Intel
+          - runner: macos-15
+            arch_label: AppleSilicon
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependencias
+        run: |
+          python3 -m pip install --upgrade pip wheel
+          pip install pyrekordbox sqlcipher3-wheels pywebview pyinstaller
+
+      - name: Definir versao
+        id: ver
+        run: |
+          RAW="${{ github.event.inputs.version }}"
+          if [ -z "$RAW" ]; then RAW="${{ github.ref_name }}"; fi
+          CLEAN="${RAW#v}"
+          if ! [[ "$CLEAN" =~ ^[0-9]+\.[0-9]+ ]]; then CLEAN="0.3.0"; fi
+          echo "version=$CLEAN" >> "$GITHUB_OUTPUT"
+
+      - name: Compilar Rekordbox Vault.app com PyInstaller
+        run: |
+          pyinstaller --noconfirm --clean --windowed --onedir \
+            --name "Rekordbox Vault" \
+            --icon "app/AppIcon.icns" \
+            --osx-bundle-identifier "com.dyfuchs.rekordboxvault" \
+            --add-data "app/ui.html:app" \
+            --add-data "app/icon.png:app" \
+            --add-data "app/icon.ico:app" \
+            --collect-all pyrekordbox \
+            --collect-all sqlcipher3 \
+            --collect-all webview \
+            app/server.py
+
+      - name: Empacotar em .dmg
+        run: |
+          chmod +x build/build_mac_dmg.sh
+          ./build/build_mac_dmg.sh "${{ steps.ver.outputs.version }}" "${{ matrix.arch_label }}"
+
+      - name: Upload artefato macOS ${{ matrix.arch_label }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: RekordboxVault-macOS-${{ matrix.arch_label }}
+          path: dist_installers/*.dmg
+
+  publish-release:
+    name: Publicar instaladores no GitHub Release
+    needs: [build-windows, build-macos]
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'release'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: all_installers
+          merge-multiple: true
+
+      - name: Anexar .exe e .dmg ao Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: all_installers/*
+          generate_release_notes: true
