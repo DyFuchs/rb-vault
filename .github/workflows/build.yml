@@ -43,6 +43,7 @@ jobs:
           echo "version=$clean" >> $env:GITHUB_OUTPUT
 
       - name: Compilar RekordboxVault.exe com PyInstaller
+        shell: cmd
         run: |
           pyinstaller --noconfirm --clean --windowed --onedir ^
             --name "RekordboxVault" ^
@@ -54,11 +55,18 @@ jobs:
             --collect-all pyrekordbox ^
             --collect-all sqlcipher3 ^
             --collect-all webview ^
+            --collect-all pythonnet ^
+            --collect-all clr_loader ^
             app/server.py
 
       - name: Gerar Instalador Windows (.exe) com Inno Setup
+        shell: cmd
         run: |
-          iscc /DAppVersion=${{ steps.ver.outputs.version }} build\installer_win.iss
+          where iscc >nul 2>nul && (
+            iscc /DAppVersion=${{ steps.ver.outputs.version }} build\installer_win.iss
+          ) || (
+            "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DAppVersion=${{ steps.ver.outputs.version }} build\installer_win.iss
+          )
 
       - name: Upload artefato Windows
         uses: actions/upload-artifact@v4
