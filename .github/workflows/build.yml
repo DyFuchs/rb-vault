@@ -9,9 +9,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Versao para a build (ex: 0.3.2 ou 0.3.34)'
+        description: 'Versao para a build (ex: 0.3.3 ou 0.3.34)'
         required: false
-        default: '0.3.2'
+        default: '0.3.3'
 
 permissions:
   contents: write
@@ -30,7 +30,7 @@ jobs:
       - name: Instalar dependencias
         run: |
           python -m pip install --upgrade pip wheel
-          pip install pyrekordbox sqlcipher3-wheels pywebview pyinstaller
+          pip install pyrekordbox sqlcipher3-wheels pywebview pyinstaller certifi
 
       - name: Definir versao
         id: ver
@@ -39,7 +39,7 @@ jobs:
           $raw = "${{ github.event.inputs.version }}"
           if (-not $raw) { $raw = "${{ github.ref_name }}" }
           $clean = $raw -replace '^v',''
-          if (-not ($clean -match '^\d+\.\d+')) { $clean = '0.3.2' }
+          if (-not ($clean -match '^\d+\.\d+')) { $clean = '0.3.3' }
           echo "version=$clean" >> $env:GITHUB_OUTPUT
 
       - name: Compilar RekordboxVault.exe com PyInstaller
@@ -57,6 +57,7 @@ jobs:
             --collect-all webview ^
             --collect-all pythonnet ^
             --collect-all clr_loader ^
+            --collect-data certifi ^
             app/server.py
 
       - name: Gerar Instalador Windows (.exe) com Inno Setup
@@ -96,7 +97,7 @@ jobs:
       - name: Instalar dependencias
         run: |
           python3 -m pip install --upgrade pip wheel
-          pip install pyrekordbox sqlcipher3-wheels pywebview pyinstaller
+          pip install pyrekordbox sqlcipher3-wheels pywebview pyinstaller certifi
 
       - name: Definir versao
         id: ver
@@ -104,7 +105,7 @@ jobs:
           RAW="${{ github.event.inputs.version }}"
           if [ -z "$RAW" ]; then RAW="${{ github.ref_name }}"; fi
           CLEAN="${RAW#v}"
-          if ! [[ "$CLEAN" =~ ^[0-9]+\.[0-9]+ ]]; then CLEAN="0.3.2"; fi
+          if ! [[ "$CLEAN" =~ ^[0-9]+\.[0-9]+ ]]; then CLEAN="0.3.3"; fi
           echo "version=$CLEAN" >> "$GITHUB_OUTPUT"
 
       - name: Compilar Rekordbox Vault.app com PyInstaller
@@ -119,6 +120,7 @@ jobs:
             --collect-all pyrekordbox \
             --collect-all sqlcipher3 \
             --collect-all webview \
+            --collect-data certifi \
             app/server.py
 
       - name: Empacotar em .dmg

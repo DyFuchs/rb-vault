@@ -34,8 +34,8 @@ if not exist ".github\workflows\build.yml" (
 if not exist ".github\workflows\build.yml" goto :no_kit
 
 set "VER="
-set /p VER="Digite a versao da tag e aperte Enter [padrao: v0.3.2]: "
-if "!VER!"=="" set "VER=v0.3.2"
+set /p VER="Digite a versao da tag e aperte Enter [padrao: v0.3.3]: "
+if "!VER!"=="" set "VER=v0.3.3"
 if /i not "!VER:~0,1!"=="v" set "VER=v!VER!"
 
 echo.

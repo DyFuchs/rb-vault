@@ -33,7 +33,7 @@ from pathlib import Path
 IS_WIN = platform.system() == "Windows"
 IS_MAC = platform.system() == "Darwin"
 
-APP_VERSION = "v0.3.2"
+APP_VERSION = "v0.3.3"
 if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
     _meipass = Path(sys._MEIPASS)
     APP_DIR = (_meipass / "app") if (_meipass / "app" / "ui.html").exists() else _meipass
@@ -3459,6 +3459,24 @@ def _pick_best_release_asset(assets: list[dict]) -> dict | None:
     return ranked[0] if _score(ranked[0]) > 0 else None
 
 
+def _get_ssl_context():
+    import ssl
+    try:
+        import certifi
+        ca = certifi.where()
+        if ca and Path(ca).exists():
+            return ssl.create_default_context(cafile=ca)
+    except Exception:
+        pass
+    for ca_cand in ("/etc/ssl/cert.pem", "/private/etc/ssl/cert.pem", "/etc/ssl/certs/ca-certificates.crt"):
+        if Path(ca_cand).exists():
+            try:
+                return ssl.create_default_context(cafile=ca_cand)
+            except Exception:
+                pass
+    return ssl.create_default_context()
+
+
 def check_github_updates(repo: str = "") -> dict:
     import urllib.request
     import urllib.error
@@ -3472,8 +3490,9 @@ def check_github_updates(repo: str = "") -> dict:
             "User-Agent": f"RekordboxVault/{APP_VERSION}",
         },
     )
+    data = None
     try:
-        with urllib.request.urlopen(req, timeout=8) as resp:
+        with urllib.request.urlopen(req, timeout=10, context=_get_ssl_context()) as resp:
             data = json.loads(resp.read().decode("utf-8", errors="replace"))
     except urllib.error.HTTPError as he:
         if he.code == 404:
@@ -3488,7 +3507,33 @@ def check_github_updates(repo: str = "") -> dict:
             }
         raise RuntimeError(f"GitHub retornou erro HTTP {he.code}.") from he
     except Exception as exc:
-        raise RuntimeError(f"Não foi possível consultar atualizações no GitHub: {exc}") from exc
+        if IS_MAC and Path("/usr/bin/curl").exists():
+            try:
+                cp = subprocess.run(
+                    [
+                        "/usr/bin/curl", "-fsSL", "--max-time", "12",
+                        "-H", "Accept: application/vnd.github+json",
+                        "-H", f"User-Agent: RekordboxVault/{APP_VERSION}",
+                        api_url,
+                    ],
+                    capture_output=True, text=True, timeout=15,
+                )
+                if cp.returncode == 0 and cp.stdout.strip():
+                    data = json.loads(cp.stdout)
+                elif "404" in (cp.stderr or ""):
+                    return {
+                        "repo": target_repo,
+                        "currentVersion": APP_VERSION,
+                        "latestVersion": APP_VERSION,
+                        "hasUpdate": False,
+                        "noReleasesYet": True,
+                        "releaseUrl": f"https://github.com/{target_repo}/releases",
+                        "downloadedFiles": list_downloaded_updates(),
+                    }
+            except Exception:
+                pass
+        if data is None:
+            raise RuntimeError(f"Não foi possível consultar atualizações no GitHub: {exc}") from exc
 
     latest_tag = str(data.get("tag_name") or data.get("name") or "").strip()
     has_update = bool(latest_tag) and (_parse_semver(latest_tag) > _parse_semver(APP_VERSION))
@@ -3521,19 +3566,31 @@ def download_github_update_asset(asset_url: str, asset_name: str, job_id: str | 
 
     req = urllib.request.Request(asset_url, headers={"User-Agent": f"RekordboxVault/{APP_VERSION}"})
     set_job_progress(job_id, 5, f"Baixando {safe_name}...")
-    with urllib.request.urlopen(req, timeout=120) as resp:
-        total = int(resp.headers.get("Content-Length") or 0)
-        done = 0
-        with open(tmp_path, "wb") as out_f:
-            while True:
-                chunk = resp.read(256 * 1024)
-                if not chunk:
-                    break
-                out_f.write(chunk)
-                done += len(chunk)
-                if total > 0:
-                    pct = 5 + int((done / total) * 93)
-                    set_job_progress(job_id, pct, f"Baixando {safe_name} ({format_bytes(done)} / {format_bytes(total)})...")
+    try:
+        with urllib.request.urlopen(req, timeout=120, context=_get_ssl_context()) as resp:
+            total = int(resp.headers.get("Content-Length") or 0)
+            done = 0
+            with open(tmp_path, "wb") as out_f:
+                while True:
+                    chunk = resp.read(256 * 1024)
+                    if not chunk:
+                        break
+                    out_f.write(chunk)
+                    done += len(chunk)
+                    if total > 0:
+                        pct = 5 + int((done / total) * 93)
+                        set_job_progress(job_id, pct, f"Baixando {safe_name} ({format_bytes(done)} / {format_bytes(total)})...")
+    except Exception as dl_exc:
+        if IS_MAC and Path("/usr/bin/curl").exists():
+            set_job_progress(job_id, 25, f"Baixando {safe_name} via macOS...")
+            cp = subprocess.run(
+                ["/usr/bin/curl", "-fsSL", "-H", f"User-Agent: RekordboxVault/{APP_VERSION}", "-o", str(tmp_path), asset_url],
+                capture_output=True, text=True, timeout=600,
+            )
+            if cp.returncode != 0 or not tmp_path.exists():
+                raise RuntimeError(f"Falha ao baixar atualização: {cp.stderr.strip() or dl_exc}") from dl_exc
+        else:
+            raise
     shutil.move(str(tmp_path), str(dst_path))
     set_job_progress(job_id, 100, "Download concluído!")
     return {

@@ -20,8 +20,8 @@ if [ ! -f ".github/workflows/build.yml" ]; then
   exit 1
 fi
 
-read -r -p "Digite a versao da tag e aperte Enter [padrao: v0.3.2]: " VER
-VER="${VER:-v0.3.2}"
+read -r -p "Digite a versao da tag e aperte Enter [padrao: v0.3.3]: " VER
+VER="${VER:-v0.3.3}"
 [[ "$VER" != v* ]] && VER="v$VER"
 
 echo "[1/5] Preparando repositorio Git local..."
